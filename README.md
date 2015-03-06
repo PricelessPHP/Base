@@ -10,4 +10,4 @@ PricelessPHP Base is a starting point to accelerate the creation of PHP projects
 * Zend Framework 1.x
 
 ## UI
-* Bootstrap, CSS, HTML, JavaSript, jQuery
+* Bootstrap, CSS, HTML, JavaScript, jQuery
