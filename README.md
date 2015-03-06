@@ -1,5 +1,5 @@
 # Base
-PricelessPHP Base is a starting point to accelerate the creation of PHP-based projects. 
+PricelessPHP Base is a starting point to accelerate the creation of PHP-based projects.<br> 
 The goal of this project is to minimize the recreation of the same logic & interface elements, therefore significantly increasing your productivity.
 
 ## License
