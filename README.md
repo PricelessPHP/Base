@@ -11,4 +11,8 @@ The goal of this project is to minimize the recreation of the same logic & inter
 * Zend Framework 1.x
 
 ## UI
-* Bootstrap, CSS, HTML, JavaScript, jQuery
+* Bootstrap
+* CSS
+* HTML
+* JavaScript
+* jQuery
