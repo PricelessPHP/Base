@@ -6,7 +6,7 @@
  * @copyright   2014 - 2015 BizLogic
  * @link        http://bizlogicdev.com
  * @link		http://pricelessphp.com
- * @license     Commercial
+ * @license     GNU Affero General Public License v3
  *
  * @since  	    Monday, June 09, 2014, 05:23 PM GMT+1
  * @modified    $Date: 2014-05-04 16:36:58 -0700 (Sun, 04 May 2014) $ $Author: hire@bizlogicdev.com $

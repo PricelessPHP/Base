@@ -4,7 +4,7 @@
  * Installer, Constants
  *
  * @author      BizLogic <hire@bizlogicdev.com>
- * @license     Commercial
+ * @license     GNU Affero General Public License v3
  * @link        http://bizlogicdev.com
  *
  * @since       Thursday, October 22, 2009 / 12:05 PM GMT+1 mknox

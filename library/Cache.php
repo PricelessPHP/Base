@@ -6,7 +6,7 @@
  * @author      BizLogic <hire@bizlogicdev.com>
  * @copyright   2012 - 2015 BizLogic
  * @link        http://bizlogicdev.com
- * @license     Commercial
+ * @license     GNU Affero General Public License v3
  *
  * @since       Tuesday, November 27, 2012, 08:00 AM GMT+1 mknox
  * @edited      $Date: 2014-10-13 11:46:37 +0200 (Mon, 13 Oct 2014) $ $Author: dev@bizlogicdev.com $

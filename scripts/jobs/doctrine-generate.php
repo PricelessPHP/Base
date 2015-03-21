@@ -9,7 +9,7 @@
  * @copyright	2014 - 2015 BizLogic
  * @link        http://bizlogicdev.com
  * @link        http://pricelessphp.com
- * @license     Commercial
+ * @license     GNU Affero General Public License v3
  *
  * @since  	    Thursday, July 24, 2014, 15:57 GMT+1
  * @modified    $Date$ $Author$

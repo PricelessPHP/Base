@@ -5,7 +5,7 @@
  *
  * @author      BizLogic <hire@bizlogic.com>
  * @copyright   2013 - 2015 BizLogic
- * @license		Commercial
+ * @license		GNU Affero General Public License v3
  * @link        http://bizlogicdev.com
  *
  * @since       Thursday, December 12, 2013 / 18:06 GMT+1
