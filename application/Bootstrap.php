@@ -111,6 +111,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     	$required[]	= BASEDIR.'/data/uploads/users';    	
     	
     	foreach( $required AS $key => $value ) {
+    	    if( !file_exists( $value ) ) {
+    	       mkdir( $value, 0777, true ); 
+    	       file_put_contents( $value.'/.htaccess', 'deny from all' );   
+    	    }
+    	    
     		if( !is_writeable( $value ) ) {
 				$errors[] = $value;    			
     		}	
