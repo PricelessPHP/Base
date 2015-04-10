@@ -2899,3 +2899,38 @@ function getScheme( $url )
 
     return '';
 }
+
+/**
+ * Get all Controllers
+ * 
+ * @param   boolean $namesOnly
+ * @return  array
+*/
+function getAllControllers( $namesOnly = true )
+{   
+    $controllers = array();
+    
+    // get the front controller instance
+    $front  = Zend_Controller_Front::getInstance();
+    $dir    = $front->getControllerDirectory();
+    
+    if( !empty( $dir ) ) {
+        foreach( $dir AS $key => $value ) {
+            $files = glob( $value.'/*' );
+            
+            if( !empty( $files ) ) {
+                foreach( $files AS $file ) {
+                    if( is_file( $file ) ) {
+                        if( $namesOnly ) {
+                            $controllers[] = str_replace( 'Controller', '', fetchFilename( basename( $file ) ) );
+                        } else {
+                            $controllers[] = basename( $file );                            
+                        }
+                    }
+                }
+            }            
+        }
+    }
+    
+    return $controllers;    
+}
