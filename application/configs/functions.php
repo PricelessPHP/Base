@@ -2929,6 +2929,19 @@ function isEven( $number )
 }
 
 /**
+ * Remove traling slash 
+ * from a string
+ * 
+ * @param   string  $string
+ * @return  string
+*/
+function removeTrailingSlash( $string )
+{
+    $string = rtrim( $string, '/' );
+    return $string;    
+}  
+
+/**
  * Get all Controllers
  * 
  * @param   boolean $namesOnly
