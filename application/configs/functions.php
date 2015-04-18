@@ -2900,6 +2900,34 @@ function getScheme( $url )
     return '';
 }
 
+function makeEven( $number )
+{
+    $number = (int)$number;
+    if( $number == 0 ) {
+        return 0;
+    }
+
+    while( !isEven( $number ) ) {
+        $number = ( $number - 1 );
+    }
+    
+    return $number;
+}
+
+function isEven( $number )
+{
+    $number = (int)$number;
+    if( $number == 0 ) {
+        return false;
+    }
+    
+    if ( $number % 2 == 0 ) {
+        return true;    
+    }
+    
+    return false;
+}
+
 /**
  * Get all Controllers
  * 
