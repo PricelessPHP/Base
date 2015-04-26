@@ -223,7 +223,7 @@
 									Database Password:
 								</td>
 								<td>
-									<input type="password" value="" id="dbPassword" name="dbPassword" required>								
+									<input type="password" value="" id="dbPassword" name="dbPassword">								
 								</td>								
 							</tr>											
 						</table>
