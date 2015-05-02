@@ -67,9 +67,13 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     
     private function _checkInstall()
     {
+        $currentUri = basename( $_SERVER['REQUEST_URI'] );
+        
     	if( file_exists( BASEDIR.'/install' ) ) {
     		if( !file_exists( BASEDIR.'/install/install.lock' ) ) {
-    			header('Location: '.BASEURL.'/install');    			
+    		    if( $currentUri != 'install' ) {
+    		        header('Location: '.BASEURL.'/install');    		    
+    		    }    		        			
     		}	
     	}	
     }
