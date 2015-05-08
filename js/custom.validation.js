@@ -1,5 +1,5 @@
 /**
- * BizLogic Base Framework
+ * PricelessPHP Base Framework
  * Custom JavaScript
  *
  * @author      BizLogic <hire@bizlogicdev.com>

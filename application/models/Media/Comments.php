@@ -1,6 +1,6 @@
 <?php
 /**
- * BizLogic Base Framework
+ * PricelessPHP Base Framework
  * Media Comments Model
  *
  * @author      BizLogic <hire@bizlogicdev.com>

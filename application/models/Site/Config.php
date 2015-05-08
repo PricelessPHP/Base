@@ -1,6 +1,6 @@
 <?php
 /**
- * BizLogic Base Framework
+ * PricelessPHP Base Framework
  * Site Config Model
  *
  * @author      BizLogic <hire@bizlogicdev.com>

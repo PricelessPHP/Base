@@ -1,6 +1,6 @@
 <?php
 /**
- * BizLogic Base Framework
+ * PricelessPHP Base Framework
  * Constants
  *
  * @author      BizLogic <hire@bizlogicdev.com>
@@ -11,7 +11,7 @@
  * @version     $Id: constants.php 109 2014-10-13 09:46:37Z dev@bizlogicdev.com $
  * @edited      $Date: 2014-10-13 11:46:37 +0200 (Mon, 13 Oct 2014) $
  *
- * @package     BizLogic Base Framework
+ * @package     PricelessPHP Base Framework
  * @category    Global Config
 */
 

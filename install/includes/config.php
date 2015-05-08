@@ -1,6 +1,6 @@
 <?php
 /**
- * BizLogic Base Framework
+ * PricelessPHP Base Framework
  * Installer, Global Config
  *
  * @author      BizLogic <hire@bizlogic.com>
@@ -12,7 +12,7 @@
  * @edited      $Date: 2011-11-03 14:59:43 +0100 (Thu, 03 Nov 2011) $
  * @version     $Id: index.php 4898 2011-11-03 13:59:43Z mknox $
  *
- * @package     BizLogic Base Framework
+ * @package     PricelessPHP Base Framework
 */
 
 error_reporting(E_ALL);

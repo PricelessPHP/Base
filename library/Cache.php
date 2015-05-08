@@ -1,6 +1,6 @@
 <?php
 /**
- * BizLogic Base Framework
+ * PricelessPHP Base Framework
  * Extends Zend_Cache
  *
  * @author      BizLogic <hire@bizlogicdev.com>
