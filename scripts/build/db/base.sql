@@ -1080,10 +1080,6 @@ INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) V
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(15, 'bootstrap', 'united', 'United', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(16, 'bootstrap', 'bootstrap-theme', 'Bootstrap (w/ theme)', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(17, 'bootstrap', 'yeti', 'Yeti', '1');
-INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(18, 'bootstrap', 'pastel', 'Pastel', '1');
-INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(19, 'bootstrap', 'autumn-dawn', 'Autumn Dawn', '1');
-INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(20, 'bootstrap', 'candy-box', 'Candy Box', '1');
-INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(21, 'bootstrap', 'sandstone', 'Sandstone', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(22, 'bootstrap', 'paper', 'Paper', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(23, 'bootstrap', 'openface', 'OpenFace', '1');
 
