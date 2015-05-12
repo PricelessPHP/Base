@@ -222,13 +222,13 @@
 	              			<a class="dropdown-toggle" data-toggle="dropdown" href="#" id="dropdown-user"><?php if( isset( $_SESSION['user']['external']['network'] ) ):?> <i class="fa fa-<?php echo $_SESSION['user']['external']['network']; ?>"></i> <?php endif;?><?php echo $_SESSION['user']['email']; ?> <span class="caret"></span></a>
 	              			<ul class="dropdown-menu" aria-labelledby="dropdown-user">
 		            			<li>
-		            				<a id="linkLogout" href="<?php PROTOCOL_RELATIVE_URL; ?>/logout"><i class="fa fa-user"></i> <?php echo translate('logout'); ?></a>
+		            				<a id="linkLogout" href="<?php PROTOCOL_RELATIVE_URL; ?>/logout"> <?php echo translate('logout'); ?></a>
 		            			</li>
 	              			</ul>
 	            		</li>	
 	            		<?php else: ?>       
             			<li>
-            				<a href="<?php PROTOCOL_RELATIVE_URL; ?>/login"><i class="fa fa-user"></i> <?php echo translate('login'); ?></a>
+            				<a href="<?php PROTOCOL_RELATIVE_URL; ?>/login"> <?php echo translate('login'); ?></a>
             			</li>	            		
 	            		<?php endif; ?>   		
 	          		</ul>
