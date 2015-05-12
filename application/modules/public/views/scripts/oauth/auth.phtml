@@ -193,7 +193,7 @@
 									<li>
 										<a id="linkLanguageCurrent" href="#" class="changeLang" data-name="<?php echo strtolower( $currentTheme ); ?>">
 											<?php $Languages = new Languages; ?>
-											<?php echo $Languages->fetchFriendlyNameById( $_SESSION['user']['site_language'] ); ?>
+											<?php echo $Languages->fetchNativeNameById( $_SESSION['user']['site_language'] ); ?>
 										</a>
 					              	</li>
 				                		<li class="divider"></li>
@@ -201,11 +201,11 @@
 					                		<li>
 					                			<?php if( $value['id'] != $_SESSION['user']['site_language'] ): ?>
 						                			<a href="#" class="changeLang" id="changeLang-<?php echo $value['id']; ?>" data-id="<?php echo $value['id']; ?>" data-name="<?php echo $value['iso_3166_1']; ?>">
-						                				<?php echo $value['friendly_name']; ?>
+						                				<?php echo $value['native_name']; ?>
 													</a>
 												<?php else: ?>
 													<a class="noBlockUI">
-														<?php echo $value['friendly_name']; ?>
+														<?php echo $value['native_name']; ?>
 													</a>																										
 												<?php endif; ?>               			
 											</li>              	

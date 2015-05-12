@@ -12,7 +12,7 @@
     					<select autocomplete="off" name="langSelect" id="langSelect">    					 
     						<option value=""><?php echo ucfirst( $_SESSION['site']['phrases']['language'] ); ?></option>
     						<?php foreach( $languages AS $key => $value ): ?>
-    						    <option <?php if( $_SESSION['user']['site_language'] == $value['id'] ): ?> selected="selected" <?php endif; ?> value="<?php echo $value['id']; ?>"><?php echo $value['friendly_name']; ?></option>
+    						    <option <?php if( $_SESSION['user']['site_language'] == $value['id'] ): ?> selected="selected" <?php endif; ?> value="<?php echo $value['id']; ?>"><?php echo $value['native_name']; ?></option>
     						<?php endforeach; ?>
     					</select>
 					<?php endif; ?>
