@@ -202,7 +202,7 @@
 				                		<li class="divider"></li>
 						              	<?php foreach( $GLOBALS['SITE_LANGUAGES'] AS $key => $value ): ?>
 					                		<li>
-    											<a class="noBlockUI">
+    											<a href="#" class="changeLang" id="changeLang-<?php echo $value['id']; ?>" data-id="<?php echo $value['id']; ?>" data-name="<?php echo $value['iso_3166_1']; ?>">
     												<?php echo $value['native_name']; ?>
     											</a>               			
 											</li>              	
