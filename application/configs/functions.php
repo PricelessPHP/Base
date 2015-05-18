@@ -3034,11 +3034,10 @@ function getStartOfWeek( $date )
         $date = time();
     }
     
-    $year   = date( 'Y', $date );
-    $week   = date( 'W', $date );
-    $day    = date( 'j', $date );
+    $year = date( 'Y', $date );
+    $week = date( 'W', $date );
     
-    return strtotime( date( datetime::ISO8601, strtotime( $year.'W'.$week.$day ) ) );    
+    return strtotime( date( datetime::ISO8601, strtotime( $year.'W'.$week ) ) );    
 }
 
 /**
