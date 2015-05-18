@@ -3027,7 +3027,7 @@ function decrypt_openssl( $string, $privateKeyPath )
  * @param   int $date
  * @return  int
 */
-function getStartOfCurrentWeek( $date )
+function getStartOfWeek( $date )
 {
     $date = (int)$date;
     if( $date == 0 ) {
