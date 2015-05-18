@@ -374,27 +374,45 @@ class Db
 	}
 
 	/**
-	 * Delete by ID
+	 * Delete by columns & values
 	 *
-	 * @param	int	$id
-	 * @return	boolean
+	 * @param	array	$attributes  
+	 * @param	int		$limit
+	 * @return	int
 	*/
-	public function deleteById( $id = 0 )
+	public function deleteBy( $attributes = array(), $limit = 1 )
 	{
-	    $id = (int)$id;
+		if( empty( $attributes ) OR !is_array( $attributes ) ) {
+			return false;
+		}
+		
+		// escape
+		foreach( $attributes AS $key => $value ) {
+			$attributes[$key] = mysqli_real_escape_string( $this->db, $value );
+		}
+				
+	    $limit = (int)$limit;
 	    
-	    if( isZero( $id ) ) {
-	        return false;
-	    }
-
 	    $sql = "DELETE FROM ";
 	    $sql .= " `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
-	    $sql .= "WHERE `id` = '".mysqli_real_escape_string( $this->db, $id )."' ";
-	    $sql .= "LIMIT 1 ";
-		
-        $res = mysqli_query( $this->db, $sql ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$sql.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
-		
-		return mysqli_affected_rows( $this->db );		
+	    $sql .= "WHERE `".mysqli_real_escape_string( $this->db, $name )."` ";
+	    
+	    foreach( $attributes AS $key => $value ) {
+	    	$i++;
+	    	$query .= "`".$key."` = '".$value."' ";
+	    	if( $i < $count ) {
+	    		$query .= " AND ";
+	    	}
+	    }	    
+	    
+	    if( $limit >= 1 ) {
+	        $sql .= "LIMIT ";
+	        $sql .= " = '".mysqli_real_escape_string( $this->db, $limit ) ."' ";
+	    }
+	
+	    $res = mysqli_query( $this->db, $sql ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$sql.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
+	
+	    return mysqli_affected_rows( $this->db, $res );
 	}
 
 	/**
