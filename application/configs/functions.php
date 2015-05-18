@@ -3018,3 +3018,46 @@ function decrypt_openssl( $string, $privateKeyPath )
     
     return $decrypted;
 }
+
+/**
+ * Get the timestamp of the 
+ * start of the week
+ * 
+ * @link    http://derickrethans.nl/calculating-start-and-end-dates-of-a-week.html 
+ * @param   int $date
+ * @return  int
+*/
+function getStartOfCurrentWeek( $date )
+{
+    $date = (int)$date;
+    if( $date == 0 ) {
+        $date = time();
+    }
+    
+    $year   = date( 'Y', $date );
+    $week   = date( 'W', $date );
+    $day    = date( 'j', $date );
+    
+    return strtotime( date( datetime::ISO8601, strtotime( $year.'W'.$week.$day ) ) );    
+}
+
+/**
+ * Get the timestamp of the
+ * end of the week
+ *
+ * @link    http://derickrethans.nl/calculating-start-and-end-dates-of-a-week.html
+ * @param   int $date
+ * @return  int
+*/
+function getEndOfWeek( $date )
+{
+    $date = (int)$date;
+    if( $date == 0 ) {
+        $date = time();
+    }
+    
+    $year = date( 'Y', $date );
+    $week = date( 'W', $date );
+        
+    return strtotime( date( datetime::ISO8601, strtotime( $year.'W'.$week.'7' ) ) );
+}
