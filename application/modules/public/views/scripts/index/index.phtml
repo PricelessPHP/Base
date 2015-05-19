@@ -207,9 +207,9 @@
 					              <a id="changeLang" href="#" data-toggle="dropdown" class="dropdown-toggle"><?php echo translate('language'); ?> </a>
 					              <ul aria-labelledby="changeLang" class="dropdown-menu">
 									<li>
-										<a id="linkLanguageCurrent" href="#" class="changeLang" data-name="<?php echo strtolower( $currentTheme ); ?>">
+										<a id="linkLanguageCurrent" href="#" class="changeLang" data-id="<?php echo $_SESSION['user']['language_id']; ?>" data-name="<?php echo strtolower( $currentTheme ); ?>">
 											<?php $Language = new Language; ?>
-											<?php echo $Language->fetchNativeNameById( $_SESSION['user']['site_language'] ); ?>
+											<?php echo $Language->fetchNativeNameById( $_SESSION['user']['language_id'] ); ?>
 										</a>
 					              	</li>
 				                		<li class="divider"></li>
@@ -217,7 +217,7 @@
 					                		<li>
     											<a href="#" class="changeLang" id="changeLang-<?php echo $value['id']; ?>" data-id="<?php echo $value['id']; ?>" data-name="<?php echo $value['iso_3166_1']; ?>">
     												<?php echo $value['native_name']; ?>
-    											</a>																										             			
+    											</a>	             			
 											</li>              	
 						              	<?php endforeach; ?>
 			              			</ul>
