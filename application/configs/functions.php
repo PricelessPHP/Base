@@ -3069,7 +3069,8 @@ function getEndOfWeek( $date )
  * @param   int     $httpErrorCode
  * @return  void
 */
-function forceError( $errorMessage = 'Error', $httpErrorCode = '404' )
+function forceError( $errorMessage = null, $httpErrorCode = '404' )
 {
+	$errorMessage = ( !strlen( trim( $errorMessage ) ) ) ? translate('error') : $errorMessage;
     throw new Zend_Controller_Action_Exception( $errorMessage, (int)$httpErrorCode );    
 }
