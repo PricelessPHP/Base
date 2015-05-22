@@ -3060,3 +3060,16 @@ function getEndOfWeek( $date )
         
     return strtotime( date( datetime::ISO8601, strtotime( $year.'W'.$week.'7' ) ) );
 }
+
+/**
+ * Force an error 
+ * 
+ * @link    http://stackoverflow.com/a/4188995
+ * @param   string  $errorMessage
+ * @param   int     $httpErrorCode
+ * @return  void
+*/
+function forceError( $errorMessage = 'Error', $httpErrorCode = '404' )
+{
+    throw new Zend_Controller_Action_Exception( $errorMessage, (int)$httpErrorCode );    
+}
