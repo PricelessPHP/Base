@@ -3085,3 +3085,16 @@ function yesterday()
 {
     return date( 'm-d-Y', strtotime( '-1 days') );    
 }
+
+/**
+ * Get the timestamp of 
+ * year
+ *
+ * @param   int $year
+ * @return  int
+*/
+function getStartOfYear( $year = null )
+{
+    $year = ( strlen( $year ) ) ? (int)$year : date( $year ); 
+    return strtotime( 'first day of January '.$year );    
+}
