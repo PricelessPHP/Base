@@ -3074,3 +3074,14 @@ function forceError( $errorMessage = null, $httpErrorCode = '404' )
 	$errorMessage = ( !strlen( trim( $errorMessage ) ) ) ? translate('error') : $errorMessage;
     throw new Zend_Controller_Action_Exception( $errorMessage, (int)$httpErrorCode );    
 }
+
+/**
+ * Get the start of yesterday
+ *
+ * @link    http://stackoverflow.com/a/16009169
+ * @return  int
+*/
+function yesterday()
+{
+    return date( 'm-d-Y', strtotime( '-1 days') );    
+}
