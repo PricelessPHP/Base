@@ -3083,7 +3083,7 @@ function forceError( $errorMessage = null, $httpErrorCode = '404' )
 */
 function yesterday()
 {
-    return date( 'm-d-Y', strtotime( '-1 days') );    
+    return strtotime( '-1 days' );    
 }
 
 /**
