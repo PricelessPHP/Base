@@ -3098,3 +3098,23 @@ function getStartOfYear( $year = null )
     $year = ( strlen( $year ) ) ? (int)$year : date( $year ); 
     return strtotime( 'first day of January '.$year );    
 }
+
+/**
+ * str_replace for dates
+ *
+ * @param   string  $search
+ * @param   string  $replace
+ * @param   string  $date
+ * @return  string
+*/
+function str_replace_date( $search, $replace, $date )
+{
+    $words = str_word_count( $date, 1 );
+    if( !empty( $words ) ) {
+        foreach( $words AS $key => $value ) {
+            $date = str_replace( $search, $replace, $date );
+        }
+    }
+
+    return $date;
+}
