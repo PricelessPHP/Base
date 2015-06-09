@@ -3078,12 +3078,11 @@ function forceError( $errorMessage = null, $httpErrorCode = '404' )
 /**
  * Get the start of yesterday
  *
- * @link    http://stackoverflow.com/a/16009169
  * @return  int
 */
 function yesterday()
 {
-    return strtotime( '-1 days' );    
+    rreturn strtotime( 'yesterday' );    
 }
 
 /**
