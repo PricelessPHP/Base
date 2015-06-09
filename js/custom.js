@@ -16,44 +16,32 @@
  * @package     Priceless PHP Base
 */
 
-function display_error_dialog( text )
+function display_error_dialog( message, title )
 {
-	if( typeof text === 'undefined' ) {
-		var text = 'An error has occurred. <br>Contact Technical Support if this issue persists.';
+	if( typeof title === 'undefined' ) {
+		var title = translate('error');
 	}
 	
-	// START:	Error Display	
-	var html	= text;
-	var $dialog = $('<div></div>')
-	.html( html )
-	.dialog({
-		title: '<i class="icon-warning-sign"></i> ERROR',
-		minWidth: percentOfWindowWidth( 50 ),
-		minHeight: percentOfWindowHeight( 40 ),
-		modal: true,
-		autoOpen: true,
-		zIndex: 2147483640,
-		buttons: {
-			 OK: function() {
-				 $(this).dialog('close');
-			 }
-		},
-		open: function() {
-			// http://stackoverflow.com/questions/4103964/icons-in-jquery-ui-dialog-title
-			$('.ui-dialog .ui-dialog-title .ui-icon').css({
-				'float': 'left',
-			    'margin-right': '4px'
-			});
-	        
-	        $('.ui-dialog-buttonpane').
-	        	find('button:contains("OK")').button({
-	        		icons: {
-	        			primary: 'ui-icon-circle-close'
-	        		}
-	        });				                
-		}
-	});				
-	// END:		Error Display	
+	if( typeof message === 'undefined' ) {
+		var message = 'An error has occurred. <br>Contact Technical Support if this issue persists.';
+	}
+	
+    bootbox.dialog({
+        title: title,
+        message: message,
+        onShow: function( obj ) {
+        	// ...
+        },
+        buttons: {
+            'OK': {
+                label: translate('ok'),
+                className: 'btn-primary',
+                callback: function () {
+                	// ...
+                }
+            }	                
+        }	            
+    });		
 }
 
 function bytesToSize(bytes) 
@@ -557,46 +545,6 @@ function unixTimestampToDate(timestamp)
 {
 	var date = new Date( timestamp * 1000 );
 	return date;
-}
-
-function display_error_dialog( text )
-{
-	if( typeof text === 'undefined' ) {
-		var text = 'An error has occurred. <br>Contact Technical Support if this issue persists.';
-	}
-	
-	// START:	Error Display	
-	var html	= text;
-	var $dialog = $('<div></div>')
-	.html( html )
-	.dialog({
-		title: '<i class="fa fa-exclamation-triangle"></i> ERROR',
-		minWidth: percentOfWindowWidth( 50 ),
-		minHeight: percentOfWindowHeight( 40 ),
-		modal: true,
-		autoOpen: true,
-		zIndex: 2147483640,
-		buttons: {
-			 OK: function() {
-				 $(this).dialog('close');
-			 }
-		},
-		open: function() {
-			// http://stackoverflow.com/questions/4103964/icons-in-jquery-ui-dialog-title
-			$('.ui-dialog .ui-dialog-title .ui-icon').css({
-				'float': 'left',
-			    'margin-right': '4px'
-			});
-	        
-	        $('.ui-dialog-buttonpane').
-	        	find('button:contains("OK")').button({
-	        		icons: {
-	        			primary: 'ui-icon-circle-close'
-	        		}
-	        });				                
-		}
-	});				
-	// END:		Error Display	
 }
 
 function noHover() 
