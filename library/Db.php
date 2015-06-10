@@ -380,7 +380,7 @@ class Db
 	 * @param	int		$limit
 	 * @return	int
 	*/
-	public function deleteBy( $attributes = array(), $limit = 1 )
+	public function deleteByAttr( $attributes = array(), $limit = 1 )
 	{
 		if( empty( $attributes ) OR !is_array( $attributes ) ) {
 			return false;
