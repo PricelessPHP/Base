@@ -3082,7 +3082,7 @@ function forceError( $errorMessage = null, $httpErrorCode = '404' )
 */
 function yesterday()
 {
-    rreturn strtotime( 'yesterday' );    
+    return strtotime( 'yesterday' );    
 }
 
 /**
