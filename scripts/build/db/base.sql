@@ -1065,7 +1065,6 @@ CREATE TABLE IF NOT EXISTS `base_site_theme` (
 
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(1, 'bootstrap', 'cerulean', 'Cerulean', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(2, 'bootstrap', 'flatly', 'Flatly', '1');
-INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(3, 'bootstrap', 'amelia', 'Amelia', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(4, 'bootstrap', 'slate', 'Slate', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(5, 'bootstrap', 'cosmo', 'Cosmo', '1');
 INSERT INTO `base_site_theme` (`id`, `type`, `name`, `display_name`, `active`) VALUES(6, 'bootstrap', 'darkly', 'Darkly', '1');
