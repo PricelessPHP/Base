@@ -440,6 +440,23 @@ class Db
 	    $res = mysqli_query( $this->db, $sql ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$sql.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
 	
 	    return mysqli_affected_rows( $this->db, $res );
+	}
+	
+	/**
+	 * Delete by ID
+	 *  
+	 * @param	integer $id
+	 * @return	integer
+	*/
+	public function deleteById( $id )
+	{
+		$sql = "DELETE FROM `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
+		$sql .= "WHERE `id` = '".mysqli_real_escape_string( $this->db, $id )."' ";
+		$sql .= "LIMIT 1 ";
+		
+		$res = mysqli_query( $this->db, $sql ) OR die( mysql_errori( $this->db )."\n".$sql );
+		
+		return mysqli_affected_rows( $this->db );		
 	}	
 
 	/**
