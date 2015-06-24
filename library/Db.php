@@ -249,10 +249,14 @@ class Db
 			return false;	
 		}
 		
-		// escape
-		foreach( $attributes AS $key => $value ) {
-		    $attributes[$key] = mysqli_real_escape_string( $this->db, $value );
-		}
+	    // escape
+	    foreach( $attributes AS $key => $value ) {
+	        if( !is_integer( $value ) ) {
+	            $attributes[$key] = mysqli_real_escape_string( $this->db, $value );
+	        } else {
+	            $attributes[$key] = (int)$value;
+	        }
+	    }
 		
 		$i 			= 0;
 		$count		= count( $attributes );
