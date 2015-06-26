@@ -29,8 +29,14 @@ require_once('functions.php');
 // global constants
 require_once('constants.php');
 
+// error log directory (PHP)
+$errorLogDir = LOG_DIR.'/error/php';
+if( !file_exists( $errorLogDir ) ) {
+    mkdir( $errorLogDir, 0777, true );
+}
+
 // error log
-ini_set('error_log', LOG_DIR.'/error/php/'.date('m-d-Y').'.log');
+ini_set( 'error_log', $errorLogDir.'/'.date('m-d-Y').'.log' );
 
 require_once('Zend/Loader/Autoloader.php');
 $Zend_Loader_Autoloader = Zend_Loader_Autoloader::getInstance();
