@@ -1229,6 +1229,20 @@ CREATE TABLE IF NOT EXISTS `base_user_confirm` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
 
 --
+-- Table structure for table `base_user_prefs`
+--
+
+CREATE TABLE IF NOT EXISTS `base_user_prefs` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `value` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `name` (`name`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+
+--
 -- Constraints for dumped tables
 --
 
@@ -1269,3 +1283,9 @@ ALTER TABLE `base_usergroup_permission`
 --
 ALTER TABLE `base_user_confirm`
   ADD CONSTRAINT `base_user_confirm_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `base_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  
+--
+-- Constraints for table `base_user_prefs`
+--
+ALTER TABLE `base_user_prefs`
+  ADD CONSTRAINT `base_user_prefs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `base_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;  
