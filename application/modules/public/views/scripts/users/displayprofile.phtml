@@ -68,7 +68,9 @@
 		var SITE_VIDEO_PLAYER						= '<?php echo SITE_VIDEO_PLAYER; ?>';
 
 		<?php foreach( $_SESSION['user'] AS $key => $value ): ?>
-			CURRENT_USER['<?php echo $key; ?>'] = '<?php echo $value; ?>';
+	        <?php if( !is_array( $value ) ): ?>
+			    CURRENT_USER['<?php echo $key; ?>'] = '<?php echo base64_encode( $value ); ?>';
+			<?php endif; ?>
 		<?php endforeach; ?>			
 	</script>    
 
