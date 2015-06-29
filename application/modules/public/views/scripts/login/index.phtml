@@ -76,9 +76,14 @@
 			var IS_MOBILE				= <?php echo (int)IS_MOBILE; ?>;	
 			var SOCIAL_LOGIN			= null;	
 					
-			<?php foreach( $_SESSION['user'] AS $key => $value ): ?>
-				CURRENT_USER['<?php echo $key; ?>'] = '<?php echo $value; ?>';
-			<?php endforeach; ?>
+			<?php 
+			    foreach( $_SESSION['user'] AS $key => $value ) {
+        	        if( !is_array( $value ) ) {
+        		        continue;
+        	        }
+            ?>        	        			
+				CURRENT_USER['<?php echo $key; ?>'] = '<?php echo base64_encode( $value ); ?>';
+			<?php } ?>
 		</script>     
 	
 	    <meta name="robots" content="noimageindex" />
