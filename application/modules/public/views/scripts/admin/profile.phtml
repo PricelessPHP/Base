@@ -28,7 +28,9 @@
 		var IS_POST			= parseInt('<?php echo ( !empty( $_POST ) ) ? 1 : 0; ?>');
 				
 		<?php foreach( $_SESSION['user'] AS $key => $value ): ?>
-			CURRENT_USER['<?php echo $key; ?>'] = '<?php echo $value; ?>';
+	        <?php if( !is_array( $value ) ): ?>
+			    CURRENT_USER['<?php echo $key; ?>'] = '<?php echo base64_encode( $value ); ?>';
+			<?php endif; ?>
 		<?php endforeach; ?>
 	</script>	
 
