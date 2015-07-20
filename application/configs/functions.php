@@ -3125,9 +3125,10 @@ function str_replace_date( $search, $replace, $date )
  * @param   int     $dateStart
  * @param   int     $dateEnd
  * @param   string  $format
+ * @param   boolean $includeWeekends
  * @return  array
 */
-function getDaysBetween( $dateStart, $dateEnd, $format = null )
+function getDaysBetween( $dateStart, $dateEnd, $format = null, $includeWeekends = false )
 {
     $daySecs    = 86400;
     $dateStart  = (int)$dateStart;
@@ -3135,6 +3136,7 @@ function getDaysBetween( $dateStart, $dateEnd, $format = null )
     $dates      = array();
     $x          = $dateStart;
     $i          = 0;
+    $weekend    = array('Saturday', 'Sunday');
     
     if( ( $dateEnd == 0 ) OR ( $dateEnd == $dateStart ) ) {
         return $dates;
@@ -3162,8 +3164,15 @@ function getDaysBetween( $dateStart, $dateEnd, $format = null )
     while( $i < $dateDiff ) {
         $i++;
         
-        $x          = ( $x + $daySecs );
-        $dates[]    = ( is_null( $format ) ) ? $x : date( $format, $x );
+        $x = ( $x + $daySecs );
+        
+        if( !$includeWeekends ) {
+            if( in_array( date('l', $x ), $weekend ) ) {
+                continue;
+            }
+        }
+        
+        $dates[] = ( is_null( $format ) ) ? $x : date( $format, $x );
     }
     
     return $dates;
