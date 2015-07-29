@@ -3177,3 +3177,66 @@ function getDaysBetween( $dateStart, $dateEnd, $format = null, $includeWeekends 
     
     return $dates;
 }
+
+/**
+ * Setup a Zend Cache
+ * instance
+ * 
+ * @param   string  $name
+ * @param   int		$duration
+ * @return  object
+*/
+function cache( $name = null, $duration = 86400 )
+{
+    $name = trim( $name );
+    if( !strlen( $name ) ) {
+        return false;
+    }  
+        
+    // START:   Setup Caching
+    $frontendOptions = array(
+        'lifetime'                  => $duration,
+        'automatic_serialization'   => true
+    );
+     
+    $backendOptions = array(
+        'cache_dir' => BASEDIR.'/data/cache/'
+    );
+     
+    // getting a Zend_Cache_Core object
+    $cache = Zend_Cache::factory(
+        'Core',
+        'File',
+        $frontendOptions,
+        $backendOptions
+    );
+    
+    Zend_Registry::set( $name, $cache );
+    return Zend_Registry::get( $name );
+}
+
+/**
+ * Return an number formatted in 
+ * the German locale
+ * 
+ * @param   int     $number
+ * @param   string  $format
+ * @param   string  $suffix
+ * @return  string
+*/
+function german_money_format( $number, $format = '%!n', $suffix = '€' )
+{
+    // get the current locale
+    $originalLocale = setlocale( LC_MONETARY, '0' );
+    
+    // change the locale to German
+    setlocale( LC_MONETARY, 'de_DE' );
+    
+    // format
+    $formattedNumber = money_format( $format, $number ) . ' ' . $suffix;
+    
+    // reset the locale
+    setlocale( LC_MONETARY, $originalLocale );
+    
+    return $formattedNumber;
+}
