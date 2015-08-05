@@ -625,6 +625,15 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getPercentage( value, total, precision )
+{
+	if( typeof precision === 'undefined' ) {
+		var precision = 1;
+	}
+	
+	return number_format( ( ( value / total ) * 100 ), precision );	
+}
+
 Array.prototype.remove = function(value) {
     if (this.indexOf(value)!==-1) {
        this.splice(this.indexOf(value) );
