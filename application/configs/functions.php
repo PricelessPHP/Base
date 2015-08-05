@@ -3249,7 +3249,7 @@ function german_money_format( $number, $format = '%!n', $suffix = '€' )
  * @param   string  $format
  * @return  string
 */
-function german_date( $date, $format = 'd.m.Y' )
+function german_date( $date, $format = '%e.%m.%Y' )
 {
     // get the current locale
     $originalLocale = setlocale( LC_TIME, '0' );
@@ -3258,7 +3258,7 @@ function german_date( $date, $format = 'd.m.Y' )
     setlocale( LC_TIME, 'de_DE' );
 
     // format
-    $formattedDate = date( $format, $number );
+    $formattedDate = strftime( $format, $date );
 
     // reset the locale
     setlocale( LC_TIME, $originalLocale );
@@ -3275,7 +3275,7 @@ function german_date( $date, $format = 'd.m.Y' )
  * @param   string  $format
  * @return  string
 */
-function localized_date( $date, $locale, $format = 'm.d.Y' )
+function localized_date( $date, $locale, $format = '%m &d %Y' )
 {
     // get the current locale
     $originalLocale = setlocale( LC_TIME, '0' );
@@ -3284,7 +3284,7 @@ function localized_date( $date, $locale, $format = 'm.d.Y' )
     setlocale( LC_TIME, $locale );
 
     // format
-    $formattedDate = date( $format, $number );
+    $formattedDate = strftime( $format, $date );
 
     // reset the locale
     setlocale( LC_TIME, $originalLocale );
