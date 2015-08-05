@@ -195,6 +195,8 @@ class Db
 		
 		if( ( $limit > 0 ) AND ( $offset > 0 ) ) {
 			$query .= "LIMIT ".$offset.", ".$limit;	
+		} else if( $limit > 0 ) {
+		    $query .= "LIMIT ".$limit;
 		}
 
 		$res  = mysqli_query( $this->db, $query ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$query.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
