@@ -3240,3 +3240,28 @@ function german_money_format( $number, $format = '%!n', $suffix = '€' )
     
     return $formattedNumber;
 }
+
+/**
+ * Return a date formatted in
+ * the German locale
+ *
+ * @param   int     $date
+ * @param   string  $format
+ * @return  string
+*/
+function german_date( $date, $format = 'd.m.Y' )
+{
+    // get the current locale
+    $originalLocale = setlocale( LC_TIME, '0' );
+
+    // change the locale to German
+    setlocale( LC_TIME, 'de_DE' );
+
+    // format
+    $formattedDate = date( $format, $number );
+
+    // reset the locale
+    setlocale( LC_TIME, $originalLocale );
+
+    return $formattedDate;   
+}
