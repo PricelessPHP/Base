@@ -3265,3 +3265,29 @@ function german_date( $date, $format = 'd.m.Y' )
 
     return $formattedDate;   
 }
+
+/**
+ * Return a date formatted in
+ * a specific locale
+ *
+ * @param   int     $date
+ * @param   string  $locale
+ * @param   string  $format
+ * @return  string
+*/
+function localized_date( $date, $locale, $format = 'm.d.Y' )
+{
+    // get the current locale
+    $originalLocale = setlocale( LC_TIME, '0' );
+
+    // change the locale
+    setlocale( LC_TIME, $locale );
+
+    // format
+    $formattedDate = date( $format, $number );
+
+    // reset the locale
+    setlocale( LC_TIME, $originalLocale );
+
+    return $formattedDate;   
+} 
