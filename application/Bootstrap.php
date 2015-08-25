@@ -192,6 +192,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {
         $Base = new Base;
         $Base->defineSiteConfig();
+        
+		// time zone
+        date_default_timezone_set( SITE_DEFAULT_TIME_ZONE );
     }
 
     private function _setupSession()
