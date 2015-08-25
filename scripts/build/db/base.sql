@@ -1008,6 +1008,7 @@ INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `categ
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(91, 'site_global_html_header', NULL, NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(92, 'site_global_html_body_start', NULL, NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(93, 'site_global_html_body_end', NULL, NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(NULL, 'site_default_time_zone', 'UTC', NULL, 'global', 'text', '1', NULL, NULL);
 
 -- --------------------------------------------------------
 
