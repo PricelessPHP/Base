@@ -280,6 +280,12 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         if( $_SESSION['user']['language_id'] != $siteDefaultLanguageId ) {
         	$_SESSION['site']['phrases'] = array_merge( $siteDefaultPhrases, $_SESSION['site']['phrases'] );
         }
+        
+        // selected locale
+        $langData       = $Language->getById( $_SESSION['user']['language_id'] );
+        $selectedLocale = $langData['iso_639'];
+        
+        $_SESSION['user']['selected_locale'] = $selectedLocale;        
     }
 
     protected function _setRunEnv()
