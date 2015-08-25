@@ -3291,3 +3291,13 @@ function localized_date( $date, $locale, $format = '%m &d %Y' )
 
     return $formattedDate;   
 } 
+
+/**
+ * Get the current user's ID
+ * 
+ * @return  int  
+*/
+function currentUserId()
+{
+    return (int)@$_SESSION['user']['id'];
+}
