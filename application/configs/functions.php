@@ -3249,7 +3249,7 @@ function german_money_format( $number, $format = '%!n', $suffix = '€' )
  * @param   string  $format
  * @return  string
 */
-function german_date( $date, $format = '%e.%m.%Y' )
+function german_date( $date, $format = '%d.%m.%Y' )
 {
     // get the current locale
     $originalLocale = setlocale( LC_TIME, '0' );
