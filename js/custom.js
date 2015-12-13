@@ -16,6 +16,20 @@
  * @package     Priceless PHP Base
 */
 
+function german_date_format( string, format ) 
+{
+	if( typeof format === 'undefined' ) {
+		format = 'd.m.Y';
+	}
+	
+	return date( format, string );	
+}
+
+function german_money_format( integer )
+{
+	return number_format( integer, 2, ',', '.' );
+}
+
 function display_error_dialog( message, title )
 {
 	if( typeof title === 'undefined' ) {
