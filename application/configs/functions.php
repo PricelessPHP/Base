@@ -3312,3 +3312,27 @@ function currentUserId()
 {
     return (int)@$_SESSION['user']['id'];
 }
+
+/**
+ * Return the current user's ID
+ *
+ * @return  int
+*/
+function userId()
+{
+    return currentUserId();
+}
+
+/**
+ * Return the user's details
+ *
+ * @return  array
+*/
+function userInfo()
+{
+    if( isset( $_SESSION['user'] ) ) {
+        return $_SESSION['user'];    
+    }
+    
+    return array();
+}
