@@ -3267,6 +3267,19 @@ function german_date( $date, $format = '%d.%m.%Y' )
 }
 
 /**
+ * Return a date formatted in
+ * the German locale
+ *
+ * @param   int     $date
+ * @param   string  $format
+ * @return  string
+*/
+function german_date_format( $date, $format = '%d.%m.%Y' )
+{
+    return german_date(  $date, $format );
+}
+
+/**
  * Format a number in German format
  *
  * @param   int     $number
