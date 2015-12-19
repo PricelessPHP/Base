@@ -301,12 +301,17 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     
     protected function _updateUserSession()
     {    	 	
+    	global $BOOTSTRAP_THEMES;
+    	
     	// we want to update the user session on every page hit
     	$User = new User();		
     	$User->updateUserSession();
     	if( !isset( $_COOKIE['theme'] ) ) {
     		setcookie( 'theme', SITE_DEFAULT_TEMPLATE, ( time() + SITE_COOKIE_EXPIRATION_DATE ) );    		
     	}
+    	
+    	// user theme
+    	$_SESSION['user']['theme'] = $BOOTSTRAP_THEMES[ $_COOKIE['theme'] ]; 
     	
     	$allowedPaths = array(
     	    'ajax',
