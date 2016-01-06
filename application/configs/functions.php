@@ -2324,6 +2324,29 @@ function slugify( $text, $limit = 255 )
     return truncate( $text, $limit, '' );
 }
 
+function slugify_safe( $string )
+{
+    $string     = strtolower( $string );    
+    $search     = array('_', "'", '!', 'ä', 'ö', 'ü', '&', '+', 'ß', ',');
+    $replace    = array('-', '-', '', 'ae', 'oe', 'ue', '', '', 'ss', '-');
+    
+    // replace
+    $string = str_replace( $search, $replace, $string );
+    
+    // fix dashes
+    $string = str_replace( '---', '-', $string ); 
+    $string = str_replace( '--', '-', $string );
+    
+    // remove spaces
+    $string = str_replace( ' ', '-', $string );
+    
+    // fix dashes, again
+    $string = str_replace( '---', '-', $string );
+    $string = str_replace( '--', '-', $string );    
+    
+    return $string;
+}
+
 /**
  * Get the username from
  * an e-mail address
