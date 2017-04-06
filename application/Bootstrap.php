@@ -57,11 +57,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     	$this->_setRunEnv();    	
     	$this->_checkFolderPerms();
     	$this->_setupDB();
+	$this->_setupSiteConfig();
         $this->_Cache = new Cache;
         $this->_setupSession();
         $this->_setupLocale();
         $this->_setupCache();
-        $this->_setupSiteConfig();
         $this->_setupLanguage();
         $this->_setupThemes();
         // cleanup
