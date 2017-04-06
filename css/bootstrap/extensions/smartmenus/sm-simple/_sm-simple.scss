@@ -88,7 +88,7 @@ $sm-simple__collapsible-sub-item-indentation:			8px !default;
 $sm-simple__desktop-bg:									$sm-simple__white !default;
 
 // Items
-$sm-simple__desktop-item-color:							$sm-simple__gray_darker !default;
+$sm-simple__desktop-item-color:							$sm-simple__gray-darker !default;
 $sm-simple__desktop-item-hover-bg:						$sm-simple__gray !default;
 $sm-simple__desktop-item-current-color:					$sm-simple__white !default;
 $sm-simple__desktop-item-current-bg:					$sm-simple__gray-darker !default;
@@ -215,7 +215,7 @@ $sm-simple__toggle-spacing: floor($sm-simple__item-height * 0.1);
 	   collapsible to desktop (navbar + dropdowns)
 	-----------------------------------------------*/
 	/* start... (it's not recommended editing these rules) */
-	.sm-simple ul{position:absolute;}
+	.sm-simple ul{position:absolute;width:12em;}
 	.sm-simple li{float:left;}
 	.sm-simple.sm-rtl li{float:right;}
 	.sm-simple ul li,.sm-simple.sm-rtl ul li,.sm-simple.sm-vertical li{float:none;}
