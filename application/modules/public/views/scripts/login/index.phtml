@@ -56,6 +56,10 @@
 										<input autocomplete="off" type="text" class="form-control input-lg" placeholder="<?php echo translate('email'); ?>" id="frmEmail" name="email" data-required="1" data-type="email">
 									</div>
 
+                                    <div class="form-group">
+                                        <input autocomplete="off" type="password" class="form-control input-lg" placeholder="<?php echo translate('password'); ?>" id="frmPassword" name="password" data-required="1" data-type="text">
+                                    </div>
+
 									<div class="form-group">
 										<button id="btnUserLogin" class="btn btn-primary btn-lg btn-block"><?php echo translate('login'); ?></button>
 									</div>
@@ -83,44 +87,73 @@
 					$.blockUI({
 						message: '<i class="fa fa-spinner fa-spin"></i>'
 					});
+
+					<?php if( SITE_LOGIN_TYPE == 'email' ): ?>
 					
-					$.ajax({
-						type: 'POST',
-						url: BASEURL + '/users/ajax',
-						data: { 
-							method: 'userLogin',
-							username: $('#frmEmail').val()
-						},
-						complete: function( jqXHR, textStatus ) {
-							// ...
-						},
-						success: function( response, textStatus, jqXHRresponse ) {
-							if( response.status == 'OK' ) {
-								if( response.result == 'MUST_VERIFY' ) {
-									$('#frmErrors').html('');
-									$('#btnUserLogin').remove();
+                        $.ajax({
+                            type: 'POST',
+                            url: BASEURL + '/users/ajax',
+                            data: {
+                                method: 'userLogin',
+                                username: $('#frmEmail').val()
+                            },
+                            complete: function( jqXHR, textStatus ) {
+                                // ...
+                            },
+                            success: function( response, textStatus, jqXHRresponse ) {
+                                if( response.status == 'OK' ) {
+                                    if( response.result == 'MUST_VERIFY' ) {
+                                        $('#frmErrors').html('');
+                                        $('#btnUserLogin').remove();
 
-									// success message
-									var message = '<i class="fa fa-check"></i> ' + str_replace( '%EMAIL%', $('#frmEmail').val(), translate('check_email_verify_login') );
+                                        // success message
+                                        var message = '<i class="fa fa-check"></i> ' + str_replace( '%EMAIL%', $('#frmEmail').val(), translate('check_email_verify_login') );
 
-									// display the success message
-									$('#frmUserLogin').html('<div class="alert alert-success">'+ message +'</div>');
+                                        // display the success message
+                                        $('#frmUserLogin').html('<div class="alert alert-success">'+ message +'</div>');
 
-									// unblock the interface
-									$.unblockUI();
-								} else {
-									// error
-								}											
-							} else {
-								$('#frmErrors').html('<div class="alert alert-danger"><i class="fa fa-warning"></i> '+ translate('authentication_failure') +'</div>')
-								$.unblockUI();
-							}
-						},
-						error: function( jqXHR, textStatus, errorThrown ) {
-							$.unblockUI();
-						},		
-						dataType: 'json'
-					});					
+                                        // unblock the interface
+                                        $.unblockUI();
+                                    } else {
+                                        // error
+                                    }
+                                } else {
+                                    $('#frmErrors').html('<div class="alert alert-danger"><i class="fa fa-warning"></i> '+ translate('authentication_failure') +'</div>')
+                                    $.unblockUI();
+                                }
+                            },
+                            error: function( jqXHR, textStatus, errorThrown ) {
+                                $.unblockUI();
+                            },
+                            dataType: 'json'
+                        });
+
+                <?php else: ?>
+                    $.ajax({
+                        type: 'POST',
+                        url: BASEURL + '/users/ajax',
+                        data: {
+                            method: 'userLogin',
+                            username: $('#frmEmail').val(),
+                            password: sha1( $('#frmPassword').val() )
+                        },
+                        complete: function( jqXHR, textStatus ) {
+                            // ...
+                        },
+                        success: function( response, textStatus, jqXHRresponse ) {
+                            if( response.status == 'LOGIN_OK' ) {
+                                window.location.reload();
+                            } else {
+                                $('#frmErrors').html('<div class="alert alert-danger"><i class="fa fa-warning"></i> '+ translate('authentication_failure') +'</div>')
+                                $.unblockUI();
+                            }
+                        },
+                        error: function( jqXHR, textStatus, errorThrown ) {
+                            $.unblockUI();
+                        },
+                        dataType: 'json'
+                    });
+                <?php endif; ?>
 				});
 						    
 				$('body').imagesLoaded( function() {
