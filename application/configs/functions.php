@@ -3543,13 +3543,13 @@ function myUUID()
 function isDev()
 {
     switch( $_SERVER['HTTP_HOST'] ) {
-        case 'labs.trustedshops.com':
-            $isDev = false;
+        case 'base.pricelessphp.com':
+            $isDev = true;
 
             break;
 
         default:
-            $isDev = true;
+            $isDev = false;
     }
 
     return $isDev;
