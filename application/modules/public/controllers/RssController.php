@@ -30,7 +30,7 @@ class RssController extends Zend_Controller_Action
     	header('Content-Type: text/xml; charset=utf-8');    	
     	$this->_helper->viewRenderer->setNoRender( true );
     	
-    	$this->_Media = new Media;   	
+    	$this->_Media = new User_Status;   	
     	    	
         $this->_requestObj	= $this->getRequest();
         $this->_requestUri	= $this->_requestObj->getRequestUri();
@@ -40,21 +40,35 @@ class RssController extends Zend_Controller_Action
 
     public function indexAction() 
     {
-    	$articles = $this->_Media->getActive( 0, 7 );
+    	$articles = $this->_Media->getBy( 
+    	    array(
+    	        array(
+    	            'column'    => 'privacy',
+                    'value'     => 'public',
+                    'operator'  => '='
+                )
+    	    ),
+    	    10, 
+    	    0, 
+    	    array(
+    	       'date' => 'DESC'     
+    	    ) 
+        );
+    	
     	if( !empty( $articles ) ) {
     		$rss = array();
     		foreach( $articles AS $key => $value ) {
     			$articles[$key]['author']	= $value['owner_name'];
-    			$rss[$key]['title']			= $value['title'];    			
-    			$rss[$key]['description']	= '<img src="'.$value['thumb_url'].'" border="0"><br>'.$value['description'];
-    			$rss[$key]['link']			= BASEURL.'/watch/'.$value['key'];
+    			$rss[$key]['title']			= truncate( $value['status'] );    			
+    			$rss[$key]['description']	= $value['status'];
+    			$rss[$key]['link']			= BASEURL.'/idea/'.$value['hash'];
     			$rss[$key]['lastUpdate']	= $value['date_added'];
     			$rss[$key]['published']		= $value['date_added'];
     		}    	
     	}
     	
         $feedData = array(
-            'title'			=> SITE_NAME.' - Most Recent Videos',
+            'title'			=> SITE_NAME.' - '.translate('most_recent_ideas'),
             'description'	=> SITE_RSS_DESCRIPTION,
             'link'			=> BASEURL,
             'charset'		=> 'utf8',

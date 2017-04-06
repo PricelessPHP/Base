@@ -43,7 +43,15 @@ class OauthController extends Zend_Controller_Action
     	$error = array();
     	
     	$Oauth_Apps = new Oauth_Apps;
-    	$app = $Oauth_Apps->getBy( $_GET['client_id'], 'uuid' );
+    	$app = $Oauth_Apps->getBy(
+    	    array(
+    	        array(
+    	            'column'    => 'uuid',
+                    'value'     => $_GET['client_id'],
+                    'operator'  => '='
+                )
+            )
+        );
     	
     	if( empty( $app ) ) {
     		$error[] = 'Invalid Client ID';    		

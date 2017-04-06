@@ -201,10 +201,16 @@
 				                		<li class="divider"></li>
 						              	<?php foreach( $GLOBALS['SITE_LANGUAGES'] AS $key => $value ): ?>
 					                		<li>
-    											<a href="#" class="changeLang" id="changeLang-<?php echo $value['id']; ?>" data-id="<?php echo $value['id']; ?>" data-name="<?php echo $value['iso_3166_1']; ?>">
-    												<?php echo $value['native_name']; ?>
-    											</a>	             			
-											</li>             	
+					                			<?php if( $value['id'] != $_SESSION['user']['site_language'] ): ?>
+						                			<a href="#" class="changeLang" id="changeLang-<?php echo $value['id']; ?>" data-id="<?php echo $value['id']; ?>" data-name="<?php echo $value['iso_3166_1']; ?>">
+						                				<?php echo $value['friendly_name']; ?>
+													</a>
+												<?php else: ?>
+													<a class="noBlockUI">
+														<?php echo $value['native_name']; ?>
+													</a>																										
+												<?php endif; ?>               			
+											</li>              	
 						              	<?php endforeach; ?>
 			              			</ul>
 			            		</li>
@@ -234,7 +240,7 @@
 	              			<a class="dropdown-toggle" data-toggle="dropdown" href="#" id="dropdown-user"><?php if( isset( $_SESSION['user']['external']['network'] ) ):?> <i class="fa fa-<?php echo $_SESSION['user']['external']['network']; ?>"></i> <?php endif;?><?php echo $_SESSION['user']['email']; ?> </a>
 	              			<ul class="dropdown-menu" aria-labelledby="dropdown-user">
 		            			<li>
-		            				<a class="noBlockUI" id="linkLogout" href="<?php PROTOCOL_RELATIVE_URL; ?>/logout">
+		            				<a class="noBlockUI" id="linkLogout" href="<?php echo PROTOCOL_RELATIVE_URL; ?>/logout">
 		            				     <?php echo translate('logout'); ?>
 		            				</a>
 		            			</li>
@@ -242,7 +248,7 @@
 	            		</li>	
 	            		<?php else: ?>       
             			<li>
-            				<a href="<?php PROTOCOL_RELATIVE_URL; ?>/login"> <?php echo translate('login'); ?></a>
+            				<a href="<?php echo PROTOCOL_RELATIVE_URL; ?>/login"><i class="fa fa-user"></i> <?php echo translate('login'); ?></a>
             			</li>	            		
 	            		<?php endif; ?>   		
 	          		</ul>

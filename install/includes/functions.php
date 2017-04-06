@@ -148,38 +148,39 @@ function getFilePerms( $file )
 /**
  * determine the server URL
  *
+ * @param   boolean $forceHttps
  * @return  string
  */
-function fetchServerURL()
+function fetchServerURL( $forceHttps = false )
 {
 	$url = fetchCurrentURL();
 
-	if(preg_match('/phpunit/', $url)) {
+	if( preg_match( '/phpunit/', $url ) ) {
 		return 'phpunit';
 	}
 
-	$url = parse_url($url);
+	$url = parse_url( $url );
 
-	if(!strlen(@$url['path'])) {
+	if( !strlen( @$url['path'] ) ) {
 		return;
 	}
 
-	$pathinfo   = pathinfo($url['path']);
+	$pathinfo   = pathinfo( $url['path'] );
 	$serverURL  = 'http';
 
-	if (@$_SERVER['HTTPS'] == 'on') {
+	if ( @$_SERVER['HTTPS'] == 'on' OR $forceHttps ) {
 		$serverURL .= 's';
 	}
 
-	$serverURL    .= "://";
-	$serverURL    .= @$_SERVER['HTTP_HOST'];
-	$dirname		= array_filter( explode( '/', $pathinfo['dirname'] ) );
+	$serverURL  .= "://";
+	$serverURL  .= @$_SERVER['HTTP_HOST'];
+	$dirname     = array_filter( explode( '/', $pathinfo['dirname'] ) );
 
 	if( empty( $dirname ) ) {
 		$pathinfo['dirname'] = '';
 	}
 		
-	$serverURL    .= $pathinfo['dirname'];
+	$serverURL .= $pathinfo['dirname'];
 
 	return $serverURL;
 }

@@ -26,7 +26,7 @@ class LoginController extends Zend_Controller_Action
     	$this->_User = new User;
     		
     	if( @$_SESSION['user']['logged_in'] ) {
-    		$returnTo = ( strlen( @$_GET['returnTo'] ) ) ? $returnTo : SITE_DEFAULT_LANDING_PAGE_AFTER_LOGIN;
+    		$returnTo = ( strlen( @$_GET['returnTo'] ) ) ? $_GET['returnTo'] : SITE_DEFAULT_LANDING_PAGE_AFTER_LOGIN;
     		header( 'Location: '.BASEURL.'/'.$returnTo );
     	}
     }
@@ -42,9 +42,23 @@ class LoginController extends Zend_Controller_Action
 			header('Content-Type: application/json');			
 			
 			switch( $method ) {
-				case 'userLogin':					
-					$data		= $this->_User->login( $_POST['username'], $_POST['password'] );						
-					$json		= array();
+				case 'userLogin':
+				    switch( USER_LOGIN_TYPE ) {
+                        case 'email':
+                            $data = $this->_User->loginByEmail(
+                                $_POST['username']
+                            );
+
+                            break;
+
+                        default:
+                            $data = $this->_User->login(
+                                $_POST['username'],
+                                $_POST['password']
+                            );
+                    }
+
+					$json           = array();
 					$json['data']	= $data;
 					
 					if( $data == 'LOGIN_OK' ) {
@@ -91,7 +105,7 @@ class LoginController extends Zend_Controller_Action
     			$_SESSION['user']['login_attempted']	= false;    			
     			$_SESSION['user']['login_error']		= false;
     			
-    			$returnTo = ( strlen( @$_GET['returnTo'] ) ) ? $returnTo : SITE_DEFAULT_LANDING_PAGE_AFTER_LOGIN;
+    			$returnTo = ( strlen( @$_GET['returnTo'] ) ) ? $_GET['returnTo'] : SITE_DEFAULT_LANDING_PAGE_AFTER_LOGIN;
     			header( 'Location: '.BASEURL.'/'.$returnTo );
     		} else {
     			$_SESSION['user']['login_attempted']	= true;    			
@@ -105,6 +119,75 @@ class LoginController extends Zend_Controller_Action
     		$this->_forward( null, 'accounts' );    		
     	}    	        	    	
     }
+
+    public function confirmAction()
+    {
+        $this->_helper->viewRenderer->setNoRender( true );
+        
+        $request    = $this->getRequest();
+        $params     = $request->getParams();
+        $code       = $params['code'];
+        
+        $User_Confirm_Login = new User_Confirm_Login();
+        $data = $User_Confirm_Login->getBy(
+            array(
+                array(
+                    'column'    => 'code',
+                    'value'     => $code,
+                    'operator'  => '='
+                )
+            )
+        );
+        
+        if( !empty( $data ) ) {
+            $User       = new User;
+            $userData   = $User->getById( $data['user_id'] );
+            
+            if( !empty( $userData ) ) {    
+                switch( $userData['site_status'] ) {
+                    case 'pending':
+                        // confirm the account
+                        $User->confirmAccountById( $userData['id'] );
+                        
+                        // add to default usergroup
+                        $User->addUserToUsergroup( 
+                            $userData['id'], 
+                            SITE_DEFAULT_USERGROUP_ID 
+                        );
+                                                
+                        break;
+                }
+                                
+                // login
+                $loginResult = $User->login(
+                    $userData['email'],
+                    $userData['password']
+                );                                              
+                
+                if( $loginResult == 'LOGIN_OK' ) {
+                    $User_Confirm_Login->deleteById( $data['id'] );
+                    header('Location: '.BASEURL);                  
+                } else {
+                    // error
+                    header('Location: '.BASEURL.'/login');
+                }
+            } else {
+                // error
+                header('Location: '.BASEURL.'/login');
+            }
+        } else {
+            header('Location: '.BASEURL.'/login');
+        }
+    }
+    
+    public function completeProfileAction()
+    {
+        $request    = $this->getRequest();
+        $params     = $request->getParams();
+        
+        printAndExit( $params );
+    }
+
     /**
      * Login via Twitter
      *

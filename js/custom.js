@@ -37,7 +37,7 @@ function display_error_dialog( message, title )
 	}
 	
 	if( typeof message === 'undefined' ) {
-		var message = 'An error has occurred. <br>Contact Technical Support if this issue persists.';
+		var message = translate('error_occurred');
 	}
 	
     bootbox.dialog({
@@ -455,10 +455,24 @@ function scrollToTop()
 	}
 }
 
-function scrollToElement( elementName )
+function scrollToElement( elementName, additionalDistance )
 {
+	if( typeof additionalDistance == 'undefined' ) {
+		additionalDistance = 0;
+	}
+
+	var targetElement;
+    var pattern = new RegExp('/^(\.|#)/');
+    var result	= pattern.test( elementName );
+
+    if( result || typeof elementName == 'object' ) {
+    	targetElement = elementName;
+	} else {
+    	targetElement = $('#' + elementName);
+	}
+
 	$('html, body').animate({
-	    scrollTop: $('#' + elementName).offset().top
+	    scrollTop: targetElement.offset().top - 100
 	}, 'slow');	
 }
 
@@ -491,7 +505,7 @@ function checkDestinationPerms()
 			
 			return returnVal;						
 		},
-		error: function(  jqXHR, textStatus, errorThrown ) {
+		error: function( jqXHR, textStatus, errorThrown ) {
 
 		},		
 		dataType: 'json'
@@ -637,6 +651,77 @@ function getRandomArbitrary(min, max) {
 */
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getCurrentDate()
+{
+    var today	= new Date();
+    var dd		= today.getDate();
+    var mm		= today.getMonth() + 1;
+    var yyyy	= today.getFullYear();
+
+    if( dd < 10 ) {
+        dd = '0' + dd;
+    }
+
+    if( mm < 10 ) {
+        mm = '0' + mm;
+    }
+
+    currentDate = dd + '.' + mm + '.' + yyyy;
+
+    return currentDate;
+}
+
+function getCurrentDateAndTime()
+{
+    var today		= new Date();
+    var dd			= today.getDate();
+    var mm			= today.getMonth() + 1;
+    var yyyy		= today.getFullYear();
+    var hours		= today.getHours();
+    var minutes		= today.getMinutes();
+    var seconds		= today.getSeconds();
+    var timezone	= jstz.determine();
+    var timezone	= timezone.name();
+
+    switch( timezone ) {
+        case 'Europe/Berlin':
+            timezone = translate('europe');
+
+            break;
+    }
+
+    if( dd < 10 ) {
+        dd = '0' + dd;
+    }
+
+    if( mm < 10 ) {
+        mm = '0' + mm;
+    }
+
+    if( hours < 10 ) {
+        hours = '0' + hours;
+    }
+
+    if( minutes < 10 ) {
+        minutes = '0' + minutes;
+    }
+
+    if( seconds < 10 ) {
+        seconds = '0' + seconds;
+    }
+
+    var currentDate = dd + '.' + mm + '.' + yyyy;
+    var currentTime = hours + ':' + minutes + ':' + seconds + ' ' + timezone;
+
+    return currentDate + ' ' + currentTime;
+}
+
+function momentGetCurrentDateAndTime()
+{
+    var momentNow = moment();
+    momentNow.format('DD.MM.YYYY HH:mm:ss');
 }
 
 function getPercentage( value, total, precision )

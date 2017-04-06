@@ -16,7 +16,8 @@
  * @package     Priceless PHP Base
 */
 
-$(document).ready(function() {	
+$(document).ready( function() {
+
 	// START:	remove address bar on mobile
 	if( typeof IS_MOBILE !== 'undefined' ) {
 		if( parseInt( IS_MOBILE == 1 ) ) {
@@ -24,6 +25,12 @@ $(document).ready(function() {
 		}		
 	}
 	// END:		remove address bar on mobile
+	
+	$(document).on('click', '#scrollUp', function( event ) {
+		setTimeout(function() { 
+			$.unblockUI(); 
+		}, 300);
+	});
 	
 	// the 'About' box...
 	$('#linkAbout').click(function(event) {
@@ -80,7 +87,7 @@ $(document).ready(function() {
 		} 					
     });
 	
-	$('#deleteOwnAvatar').live('click', function(event) {
+	$(document).on('click', '#deleteOwnAvatar', function(event) {
 		event.stopImmediatePropagation();
 		event.preventDefault();
 
@@ -88,7 +95,7 @@ $(document).ready(function() {
 		var $dialog = $('<div></div>')
 						.html('Are you sure that you want to delete your avatar?')
 						.dialog({
-							title: '<i class="icon-warning-sign"></i> Delete Your Avatar?',
+							title: '<i class="fa fa-warning"></i> Delete Your Avatar?',
 							minWidth: 600,
 							minHeight: 200,
 							modal: true,
@@ -138,7 +145,7 @@ $(document).ready(function() {
 												$('.ui-dialog-content').dialog('close');		
 											}								
 										},
-										error: function(  jqXHR, textStatus, errorThrown ) {
+										error: function( jqXHR, textStatus, errorThrown ) {
 
 										},		
 										dataType: 'json'
@@ -212,7 +219,7 @@ $(document).ready(function() {
 		$('i.' + id).show();
 	});
 	
-	$('.removeMore').live('click', function(event) {
+	$(document).on('click', '.removeMore', function(event) {
 		var id		= $(this).data('id');
 		var name	= $('#' + id).attr('name');
 		var type	= $('#' + id).prop('tagName');
@@ -233,7 +240,7 @@ $(document).ready(function() {
 		}
 	});	
 			
-	$('.changeLang').live('click', function(event) {
+	$(document).on('click', '.changeLang', function(event) {
 		// close the menu on mobile
 		$('.navbar-collapse').removeClass('in');
 		
@@ -244,7 +251,7 @@ $(document).ready(function() {
 		
 		$.blockUI({ 
 			baseZ: 16777271, 
-			message: '<img border="0" src="' + BASEURL + '/images/preloader/168.gif">' 
+			message: '<i class="fa fa-cog fa-spin"></i>' 
 		});
 		
 		$.ajax({
@@ -264,14 +271,14 @@ $(document).ready(function() {
 					$.unblockUI();
 				}
 			},
-			error: function(  jqXHR, textStatus, errorThrown ) {
+			error: function( jqXHR, textStatus, errorThrown ) {
 				// ...
 			},		
 			dataType: 'json'
 		});			
 	});
 	
-	$('.changeTheme').live('click', function(event) {
+	$(document).on('click', '.changeTheme', function( event ) {
 		// close the menu on mobile
 		$('.navbar-collapse').removeClass('in');
 		
@@ -305,7 +312,7 @@ $(document).ready(function() {
 					case 'uw-clone-v2':
 						$.blockUI({ 
 							baseZ: 2014, 
-							message: '<img border="0" src="' + BASEURL + '/images/preloader/168.gif">' 
+							message: '<i class="fa fa-cog fa-spin"></i>' 
 						});
 						
 						$.cookie('theme', theme, { 
@@ -331,13 +338,14 @@ $(document).ready(function() {
 			$.cookie('theme', theme, { 
 				expires: 7300, 
 				path: '/',
+				domain: SITE_COOKIE_DOMAIN,
 				onSet: function( result ) {					
 					if( result.length > 0 ) {
 						window.location.reload();
 					}
 				}
-			});			
-		}												
+			});
+		}
 	});
 	
 	$('.backToTop').click(function(event) {
@@ -350,7 +358,7 @@ $(document).ready(function() {
 		scrollToTop();		
 	});
 			
-	$('.blockUI-trigger').live('click', function(event) {
+	$(document).on('click', '.blockUI-trigger', function(event) {
 		if( typeof USE_BLOCKUI === 'undefined' ) {
 			return;
 		} else if ( USE_BLOCKUI != 1 ) {
@@ -362,7 +370,7 @@ $(document).ready(function() {
 		}		
 		
 		$.blockUI({ 
-			message: '<img border="0" src="' + DEFAULT_PRELOADER_IMAGE + '" />', 
+			message: DEFAULT_PRELOADER_IMAGE, 
 			// styles for the overlay 
 	    	overlayCSS:  { 
 	    		backgroundColor: '#000000', 
@@ -372,7 +380,7 @@ $(document).ready(function() {
 		});
 	});
 	
-	$('a').live('click', function(event) {
+	$(document).on('click', 'a', function(event) {
 		if( typeof USE_BLOCKUI === 'undefined' ) {
 			return;
 		} else if ( USE_BLOCKUI != 1 ) {
@@ -453,7 +461,7 @@ $(document).ready(function() {
 		// END:		check href
 		
 		$.blockUI({ 
-			message: '<img border="0" src="' + DEFAULT_PRELOADER_IMAGE + '" />', 
+			message: DEFAULT_PRELOADER_IMAGE, 
 			overlayCSS: { 
 				backgroundColor: '#000000' 
 			}
@@ -468,15 +476,20 @@ $(document).ready(function() {
 			return false;			
 		}
 		
-		$.blockUI({ baseZ: 2014, message: '<img border="0" src="' + BASEURL + '/images/preloader/168.gif">' });
+		$.blockUI({ 
+			baseZ: 2014, 
+			message: '<i class="fa fa-cog fa-spin"></i>' 
+		});
+		
 		$.ajax({
 			type: 'POST',
 			url: BASEURL + '/users/ajax',
-			data: { method: 'changeLang',
-					langId: langId
+			data: { 
+				method: 'changeLang',
+				langId: langId
 			},
 			complete: function( jqXHR, textStatus ) {
-				
+				// ...
 			},
 			success: function( response, textStatus, jqXHRresponse ) {
 				if( response.status == 'OK' ) {
@@ -485,8 +498,8 @@ $(document).ready(function() {
 					$.unblockUI();
 				}
 			},
-			error: function(  jqXHR, textStatus, errorThrown ) {
-
+			error: function( jqXHR, textStatus, errorThrown ) {
+				// ...
 			},		
 			dataType: 'json'
 		});	
@@ -496,7 +509,11 @@ $(document).ready(function() {
 		var value = trim( $(this).val() );
 		if( value.length > 0 ) {
 			var id = $('#themeSelect').find('option:selected').data('id');
-			$.blockUI({ baseZ: 2014, message: '<img border="0" src="' + BASEURL + '/images/preloader/168.gif">' });
+			$.blockUI({ 
+				baseZ: 2014, 
+				message: '<i class="fa fa-cog fa-spin"></i>' 
+			});
+			
 			$.ajax({
 				type: 'POST',
 				url: BASEURL + '/users/ajax',
@@ -506,23 +523,28 @@ $(document).ready(function() {
 					theme: value
 				},
 				complete: function( jqXHR, textStatus ) {
+					// ...
 				},
 				success: function( response, textStatus, jqXHRresponse ) {
 					if( response.status == 'OK' ) {
-						$.cookie('theme', value, { expires: 1460, path: '/' });
+						$.cookie('theme', value, {
+							expires: 1460,
+							path: '/',
+							domain: SITE_COOKIE_DOMAIN
+						});
 						window.location.reload();					
 					} else {
 						$.unblockUI();
 					}
 				},
-				error: function(  jqXHR, textStatus, errorThrown ) {
+				error: function( jqXHR, textStatus, errorThrown ) {
 				},		
 				dataType: 'json'
 			});				
 		}
 	});
 	
-	$('#btnLogin').live('click', function(event) {
+	$(document).on('click', '#btnLogin', function(event) {
 		event.preventDefault();
 		var username = trim( $('#username').val() );
 		var password = trim( $('#password').val() );
@@ -539,9 +561,10 @@ $(document).ready(function() {
 		$.ajax({
 			type: 'POST',
 			url: BASEURL + '/ajax',
-			data: { method: 'user-login',
-					username: $('#username').val(),
-					password: $('#loginPassword').val()
+			data: { 
+				method: 'user-login',
+				username: $('#username').val(),
+				password: $('#loginPassword').val()
 			},
 			complete: function( jqXHR, textStatus ) {
 				// ...
@@ -556,24 +579,94 @@ $(document).ready(function() {
 						window.location.reload();
 					} else {
 						$.unblockUI();
-						$('#login-errors').html('<i class="icon-warning-sign"></i> Login error').show();
+						$('#login-errors').html('<i class="fa fa-warning"></i> Login error').show();
 						$('#username').addClass('error');
 						$('#password').addClass('error');
 						$('.lblCustom').addClass('error');						
 					}
 				} else {
 					$.unblockUI();
-					$('#login-errors').html('<i class="icon-warning-sign"></i> Login error').show();
+					$('#login-errors').html('<i class="fa fa-warning"></i> Login error').show();
 					$('#username').addClass('error');
 					$('#password').addClass('error');
 					$('.lblCustom').addClass('error');
 				}
 			},
-			error: function(  jqXHR, textStatus, errorThrown ) {
+			error: function( jqXHR, textStatus, errorThrown ) {
 				$.unblockUI();
 			},		
 			dataType: 'json'
 		});		
 	});	
 	
+	$(document).on('click', '.themeInvert', function( event ) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		var ME = $(this);
+
+		var currentState = ME.hasClass('fa-toggle-off') ? 'default' : 'inverse';
+
+		switch( currentState ) {
+			case 'default':
+                $('#navbar-main').parents('div.navbar').removeClass('navbar-default').addClass('navbar-inverse');
+                ME.removeClass('fa-toggle-off').addClass('fa-toggle-on');
+
+                // set cookie
+                $.cookie('theme-inverse', 1, {
+                    expires: 7300,
+                    path: '/',
+                    domain: SITE_COOKIE_DOMAIN,
+                    onSet: function( result ) {
+                        if( result.length > 0 ) {
+                            // ...
+                        }
+                    }
+                });
+
+				break;
+
+			case 'inverse':
+                $('#navbar-main').parents('div.navbar').removeClass('navbar-inverse').addClass('navbar-default');
+                ME.removeClass('fa-toggle-on').addClass('fa-toggle-off');
+
+                // set cookie
+                $.cookie('theme-inverse', 0, {
+                    expires: 7300,
+                    path: '/',
+                    domain: SITE_COOKIE_DOMAIN,
+                    onSet: function( result ) {
+                        if( result.length > 0 ) {
+							// ...
+                        }
+                    }
+                });
+
+				break;
+		}
+	});
+
+    if( $.views ) {
+        $.views.converters('nltobr', function( val ) {
+        	if( val ) {
+                val = val.replace(/\\n/g, '<br />');
+                val = stripslashes( val );
+			}
+
+            return val;
+        });
+
+        $.views.converters('translate', function( val ) {
+            return translate( val );
+        });
+
+        $.views.converters('translateAndUppercase', function( val ) {
+            return strtoupper( translate( val ) );
+        });
+
+        $.views.converters('strtoupper', function( val ) {
+            return strtoupper( val );
+        });
+    }
+
 });

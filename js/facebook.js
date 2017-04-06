@@ -98,7 +98,7 @@ function facebook_get_user_info()
 						$.unblockUI();
 					}
 				},
-				error: function(  jqXHR, textStatus, errorThrown ) {
+				error: function( jqXHR, textStatus, errorThrown ) {
 					$.unblockUI();
 				},		
 				dataType: 'json'

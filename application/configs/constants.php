@@ -22,8 +22,9 @@ define( 'BASEURL', BASE_URL );
 
 $protocolRelativeUrl = str_replace('http://', '//', BASEURL );
 $protocolRelativeUrl = str_replace('https://', '//', $protocolRelativeUrl );
-define( 'PROTOCOL_RELATIVE_URL', $protocolRelativeUrl );
 
+define( 'PROTOCOL_RELATIVE_URL', $protocolRelativeUrl );
+define( 'HTTPS_URL', 'https://'.$protocolRelativeUrl );
 define( 'ADMIN_URL', BASEURL.'/admin' );
 define( 'IMG_URL', BASEURL.'/img' );
 define( 'IMGURL', IMG_URL );

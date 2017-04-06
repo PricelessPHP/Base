@@ -128,7 +128,7 @@ function googleplus_login_local()
 					$.unblockUI();
 				}
 			},
-			error: function(  jqXHR, textStatus, errorThrown ) {
+			error: function( jqXHR, textStatus, errorThrown ) {
 				$.unblockUI();
 			},		
 			dataType: 'json'

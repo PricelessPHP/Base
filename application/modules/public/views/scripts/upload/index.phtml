@@ -582,7 +582,7 @@
 					    		success: function( response, textStatus, jqXHRresponse ) {
 					    	    	
 					    		},
-					    		error: function(  jqXHR, textStatus, errorThrown ) {
+					    		error: function( jqXHR, textStatus, errorThrown ) {
 	
 					    		},		
 					    		dataType: 'json'
@@ -626,7 +626,7 @@
 								$('#uploadFiles').button({ disabled: true });								
 							}	
 						},
-						error: function(  jqXHR, textStatus, errorThrown ) {
+						error: function( jqXHR, textStatus, errorThrown ) {
 							$.pnotify_remove_all();	
 
 							$.pnotify({

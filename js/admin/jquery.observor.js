@@ -58,7 +58,7 @@ $(document).ready(function() {
 						});					
 					}
 				},
-				error: function(  jqXHR, textStatus, errorThrown ) {
+				error: function( jqXHR, textStatus, errorThrown ) {
 					// ...
 				},		
 				dataType: 'json'
@@ -98,7 +98,7 @@ $(document).ready(function() {
 					$.unblockUI();
 				}
 			},
-			error: function(  jqXHR, textStatus, errorThrown ) {
+			error: function( jqXHR, textStatus, errorThrown ) {
 
 			},		
 			dataType: 'json'
@@ -159,7 +159,7 @@ $(document).ready(function() {
 												$('.ui-dialog-content').dialog('close');		
 											}								
 										},
-										error: function(  jqXHR, textStatus, errorThrown ) {
+										error: function( jqXHR, textStatus, errorThrown ) {
 										},		
 										dataType: 'json'
 									});	
@@ -315,7 +315,7 @@ $(document).ready(function() {
 					$.unblockUI();
 				}
 			},
-			error: function(  jqXHR, textStatus, errorThrown ) {
+			error: function( jqXHR, textStatus, errorThrown ) {
 
 			},		
 			dataType: 'json'
@@ -348,7 +348,7 @@ $(document).ready(function() {
 						$.unblockUI();
 					}
 				},
-				error: function(  jqXHR, textStatus, errorThrown ) {
+				error: function( jqXHR, textStatus, errorThrown ) {
 
 				},		
 				dataType: 'json'

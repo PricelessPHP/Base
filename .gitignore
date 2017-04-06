@@ -1,10 +1,4 @@
-
 .buildpath
-
 .project
-
-.settings/org.eclipse.php.core.prefs
-
-.settings/org.eclipse.php.debug.core.Debug_Process_Preferences.prefs
-
-.settings/org.eclipse.php.server.core.phpServersPrefs.prefs
+.settings/*
+.idea/*

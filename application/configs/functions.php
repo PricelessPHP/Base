@@ -31,6 +31,21 @@ if( !function_exists('getallheaders') ) {
 	}
 }
 
+function getDomainFromEmail( $email )
+{
+    $domain = substr( strrchr( $email, '@' ), 1 );
+    return $domain;
+}
+
+function getUsernameFromEmail( $email )
+{
+    $parts = explode( '@', $email );
+    if( !empty( $parts ) ) {
+        return $parts[0];
+    } else {
+        return false;
+    }
+}
 
 function get_all_headers()
 {
@@ -388,6 +403,24 @@ function add_backticks_to_array_elements( $array )
 	return array_map( 'add_backticks', $array );
 }
 
+function add_single_quotes( $value )
+{
+    return "'".$value."'";
+}
+
+function add_single_quotes_to_array_elements( $array, $mysqlEscape = false )
+{
+    if( $mysqlEscape ) {
+        $db = Zend_Registry::get('DB_CONNECTION');
+
+        foreach( $array AS $key => $value ) {
+            $array[ $key ] = mysqli_real_escape_string( $db, $value );
+        }
+    }
+
+    return array_map( 'add_single_quotes', $array );
+}
+
 // @link	http://nsaunders.wordpress.com/2007/01/12/running-a-background-process-in-php/
 function run_in_background( $command, $priority = 0)
 {
@@ -472,6 +505,11 @@ function hasAdminPerms()
 }
 
 function canAdmin()
+{
+    return hasAdminPermissions();
+}
+
+function isAdmin()
 {
     return hasAdminPermissions();
 }
@@ -616,13 +654,18 @@ function fetchColumnNames( $tableName, $returnAllData = false )
 // http://stackoverflow.com/a/11429272
 function get_enum_values( $table, $column )
 {
-	$enum = array();
-	$sql = "SHOW COLUMNS FROM ".mysql_real_escape_string( $table )." WHERE Field = '".mysql_real_escape_string( $column )."'";
-	$res = mysql_query( $sql ) OR die( mysql_error() );
+    $db     = Zend_Registry::get('DB_CONNECTION');
+	$enum   = array();
+	$sql    = "SHOW COLUMNS FROM ".mysqli_real_escape_string( $db, $table )." WHERE Field = '".mysqli_real_escape_string( $db, $column )."'";
+	$res    = mysqli_query( $db, $sql ) OR die( mysqli_error( $db ) );
 
-	if( mysql_num_rows( $res ) > 0 ) {
-		$data = mysql_fetch_assoc( $res );
+	if( mysqli_num_rows( $res ) > 0 ) {
+		$data = mysqli_fetch_assoc( $res );
 		preg_match('/^enum\((.*)\)$/', $data['Type'], $matches);
+
+        if( empty( $matches ) ) {
+            return array();
+        }
 
 		foreach( explode(',', $matches[1]) AS $value ) {
 			$enum[] = trim( trim( $value, "'" ) );
@@ -744,9 +787,10 @@ function fetchFilename($file)
 /**
  * determine the server URL
  *
+ * @param   boolean $forceHttps
  * @return  string
 */
-function fetchServerURL()
+function fetchServerURL( $forceHttps = false )
 {
 	if( defined('SITE_URL') ) {
 		return SITE_URL;	
@@ -767,7 +811,7 @@ function fetchServerURL()
     $pathinfo   = pathinfo($url['path']);
     $serverURL  = 'http';
 
-    if( @$_SERVER['HTTPS'] == 'on' ) {
+    if( @$_SERVER['HTTPS'] == 'on' OR $forceHttps ) {
 	    $serverURL .= 's';
 	}
 
@@ -811,6 +855,11 @@ function fetchCurrentURL()
 	}
 
     return $pageURL;
+}
+
+function currentUrl()
+{
+    return fetchCurrentURL();
 }
 
 /**
@@ -1672,6 +1721,11 @@ function remove_newlines($string)
     return (string)str_replace(array("\r", "\r\n", "\n"), '', $string);
 }
 
+function stripLineBreaks( $string )
+{
+    return stripcslashes( $string );
+}
+
 /**
  * determine if a script is running by name
  *
@@ -2042,6 +2096,37 @@ function seconds_to_hms( $seconds )
 			"s" => (int) $seconds,
 	);
 	return $obj;
+}
+
+function ms_to_hms( $milliseconds, $includeMs = false ) {
+    $seconds        = floor($milliseconds / 1000);
+    $minutes        = floor($seconds / 60);
+    $hours          = floor($minutes / 60);
+    $milliseconds   = $milliseconds % 1000;
+    $seconds        = $seconds % 60;
+    $minutes        = $minutes % 60;
+
+    if( $includeMs ) {
+        $format = '%02uh %02um %02us %03ums';
+        $time   = sprintf( $format, $hours, $minutes, $seconds, $milliseconds );
+    } else {
+        $format = '%02uh %02um %02us';
+        $time   = sprintf( $format, $hours, $minutes, $seconds );
+    }
+
+    return $time;
+}
+
+function millisecondsTominutesAndSeconds( $milliseconds ) {
+    $seconds        = floor($milliseconds / 1000);
+    $minutes        = floor($seconds / 60);
+    $seconds        = $seconds % 60;
+    $minutes        = $minutes % 60;
+
+    $format         = '%02u:%02u';
+    $time           = sprintf( $format, $minutes, $seconds );
+
+    return $time;
 }
 
 /**
@@ -2588,10 +2673,10 @@ function array_column_multidimensional( $array, $column )
  *
  * @return mixed string or long
 */
-function alphaID($in = null, $to_num = false, $pad_up = false, $pass_key = null)
+function alphaId($in = null, $to_num = false, $pad_up = false, $pass_key = null)
 {
-    if( !is_null( $in ) ) {
-        $in = mt_rand();
+    if( is_null( $in ) ) {
+        $in = randomString( rand( 8, 255 ) );
     }
 
     $out   =   '';
@@ -3094,8 +3179,8 @@ function getEndOfWeek( $date = null )
 */
 function forceError( $errorMessage = null, $httpErrorCode = '404' )
 {
-	$errorMessage = ( !strlen( trim( $errorMessage ) ) ) ? translate('error') : $errorMessage;
-    throw new Zend_Controller_Action_Exception( $errorMessage, (int)$httpErrorCode );    
+    $errorMessage = ( !strlen( trim( $errorMessage ) ) ) ? translate('error') : $errorMessage;
+    throw new Zend_Controller_Action_Exception( $errorMessage, (int)$httpErrorCode );
 }
 
 /**
@@ -3371,4 +3456,129 @@ function userInfo()
     }
     
     return array();
+}
+
+function embed_instagram( $string )
+{
+    if( contains_instagram_url( $string ) ) {
+        $url = extract_instagram_url( $string );
+
+        if( !empty( $url ) ) {
+            $json = file_get_contents( 'https://api.instagram.com/oembed/?url='.$url['0'] );
+            $json = json_decode( $json, true );
+
+            if( isset( $json['html'] ) ) {
+                $string = str_replace( $url[0], $json['html'], $string );
+            }
+        }
+    }
+
+    return $string;
+}
+
+function contains_instagram_url( $string )
+{
+    $pattern = '#(https?://)?(www\.)?instagr(\.am|am\.com)/p/.*#i';
+    if( preg_match( $pattern, $string, $matches ) ) {
+        return true;
+    }
+}
+
+function extract_instagram_url( $string )
+{
+    $matches = array();
+    $pattern = '#(https?://)?(www\.)?instagr(\.am|am\.com)/p/.*#i';
+
+    preg_match( $pattern, $string, $matches );
+
+    if( !empty( $matches ) ) {
+        return array_values( array_filter( $matches ) );
+    }
+
+    return $matches;
+}
+
+function user()
+{
+    return @$_SESSION['user'];
+}
+
+function varToConsole($var, $name='', $now=false)
+{
+    if ($var === null)          $type = 'NULL';
+    else if (is_bool    ($var)) $type = 'BOOL';
+    else if (is_string  ($var)) $type = 'STRING['.strlen($var).']';
+    else if (is_int     ($var)) $type = 'INT';
+    else if (is_float   ($var)) $type = 'FLOAT';
+    else if (is_array   ($var)) $type = 'ARRAY['.count($var).']';
+    else if (is_object  ($var)) $type = 'OBJECT';
+    else if (is_resource($var)) $type = 'RESOURCE';
+    else                        $type = '???';
+
+    if ( strlen( $name ) ) {
+        strToConsole( $type.' '.$name.' = '.var_export( $var, true ).';', $now );
+    } else {
+        strToConsole( $type.' = '.var_export( $var, true ).';', $now );
+    }
+}
+
+function strToConsole( $str, $now = false )
+{
+    if ( $now ) {
+        echo "<script type='text/javascript'>\n";
+        echo "//<![CDATA[\n";
+        echo "console.info(", json_encode( $str ), ");\n";
+        echo "//]]>\n";
+        echo "</script>";
+    } else {
+        register_shutdown_function( 'strToConsole', $str, true );
+    }
+}
+
+function myUUID()
+{
+    return @$_SESSION['user']['uuid'];
+}
+
+function isDev()
+{
+    switch( $_SERVER['HTTP_HOST'] ) {
+        case 'labs.trustedshops.com':
+            $isDev = false;
+
+            break;
+
+        default:
+            $isDev = true;
+    }
+
+    return $isDev;
+}
+
+function getDigits( $string )
+{
+    preg_match_all( '!\d+!', $string, $matches );
+    return $matches[0];
+}
+
+function getInitialDigits( $string )
+{
+    preg_match_all( '!\d+!', $string, $matches );
+    return @$matches[0][0];
+}
+
+function isMultiDimensionalArray( $array )
+{
+    foreach ( $array as $value ) {
+        if ( is_array( $value ) ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function microtimeToHumanReadable( $microtime )
+{
+    return number_format( $microtime, 4 ).' '.translate('seconds');
 }

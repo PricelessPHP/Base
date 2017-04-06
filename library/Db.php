@@ -32,7 +32,17 @@ class Db
                 E_USER_ERROR 
             );		    
 		}
-	}		
+	}
+
+    /**
+     * Get all column names
+     *
+     * @return	array
+     */
+    public function getColumns()
+    {
+        return fetchColumns( $this->tableName );
+    }
 
 	/**
 	 * Get by ID
@@ -221,19 +231,177 @@ class Db
 		return $data['count'];		
 	}
 	
-	public function countBy( $column, $value )
+	public function countBy( $attributes = array() )
 	{
-		$column = mysqli_real_escape_string( $this->db, $column );
-		$value	= mysqli_real_escape_string( $this->db, $value ); 
+        return $this->countByAttr( $attributes );
+	}
+	
+	public function countByAttr( $attributes = array() )
+	{
+        if( empty( $attributes ) OR !is_array( $attributes ) ) {
+			return false;	
+		}
 		
-		$query = "SELECT COUNT(*) AS `count` FROM ";
-		$query .= " `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
-		$query .= "WHERE `".$column."` = '".$value."' ";
-				
-		$res	= mysqli_query( $this->db, $query ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$query.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
-		$data	= mysqli_fetch_assoc( $res );
+        // allowed operators
+	    $validOperators = array(
+	        '=',
+	        '!=',
+	        '<>',
+	        '<',
+	        '>',
+	        '>=',
+	        '<=',
+	        'LIKE',
+	        'NOT LIKE',
+	    );
+	
+	    // escape
+	    foreach( $attributes AS $key => $value ) {
+	        if( !in_array( $value['operator'], $validOperators ) ) {
+	            unset( $attributes[ $key ] );
+	        } else {
+	            $attributes[$key]['column']    = mysqli_real_escape_string( $this->db, $value['column'] );	             
+	            $attributes[$key]['value']     = mysqli_real_escape_string( $this->db, $value['value'] );	             
+	        }
+	    }
 		
-		return $data['count'];
+		$i        = 0;
+		$count    = count( $attributes );
+	
+	    $query     = "SELECT COUNT(*) AS `count` FROM ";
+	    $query    .= " `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
+	    $query    .= "WHERE ";
+	    
+	    foreach( $attributes AS $key => $value ) {
+	        $i++;
+
+            switch( $value['operator'] ) {
+                case 'IS NULL':
+                case 'IS NOT NULL':
+                    $query .= "`".$value['column']."` ".$value['operator']." ";
+
+                    break;
+
+                default:
+                    $query .= "`".$value['column']."` ".$value['operator']." '".$value['value']."' ";
+            }
+
+	        if( $i < $count ) {
+	            $query .= " AND ";
+	        }
+	    }	    
+	
+	    $res	= mysqli_query( $this->db, $query ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$query.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
+	    $data	= mysqli_fetch_assoc( $res );
+	
+	    return $data['count'];
+	}
+	
+	/**
+	 * Search
+	 *
+	 * @param	array	$attribues
+	 * @param	int		$limit
+	 * @param	int		$offset
+	 * @param	array	$orderBy
+	 * @return	array
+	 */
+	public function search( $attributes = array(), $limit = 1, $offset = 0, $orderBy = array() )
+	{
+	    if( empty( $attributes ) OR !is_array( $attributes ) ) {
+	        return false;
+	    }
+	    
+	    // allowed operators
+	    $validOperators = array(
+	        '=',
+	        '!=',
+	        '<>',
+	        '<',
+	        '>',
+	        '>=',
+	        '<=',
+	        'LIKE',
+	        'NOT LIKE',
+	    );
+	
+	    // escape
+	    foreach( $attributes AS $key => $value ) {
+	        if( !in_array( $value['operator'], $validOperators ) ) {
+	            unset( $attributes[ $key ] );
+	        } else {
+	            $attributes[$key]['column']    = mysqli_real_escape_string( $this->db, $value['column'] );	             
+	            $attributes[$key]['value']     = mysqli_real_escape_string( $this->db, $value['value'] );	             
+	        }
+	    }
+	
+	    $i 			= 0;
+	    $count		= count( $attributes );
+	
+	    $query = "SELECT * FROM `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
+	    $query .= "WHERE ";
+	    
+	    foreach( $attributes AS $key => $value ) {
+	        $i++;
+	        
+	        $query .= "`".$value['column']."` ".$value['operator']." '".$value['value']."' ";
+	        
+	        if( $i < $count ) {
+	            $query .= " AND ";
+	        }
+	    }
+	
+	    if( !empty( $orderBy ) ) {
+	        $count 	= count( $orderBy );
+	        $i		= 0;
+	
+	        $query .= "ORDER BY ";
+	        foreach( $orderBy AS $orderKey => $orderValue ) {
+	            $i++;
+	
+	            $query .= "`".mysqli_real_escape_string( $this->db, $orderKey )."` ";
+	            $query .= mysqli_real_escape_string( $this->db, $orderValue )." ";
+	
+	            if( $i < $count ) {
+	                $query .= ", ";
+	            }
+	        }
+	    }
+	
+	    $limit	= (int)$limit;
+	    $offset = (int)$offset;
+	    $data	= array();
+	
+	    if( ( $limit > 0 ) AND ( $offset >= 0 ) ) {
+	        $query .= "LIMIT ".$offset.", ".$limit;
+	    } elseif ( $limit == 1 ) {
+	        $query .= "LIMIT 1 ";
+	    }
+	
+	    $res = mysqli_query( $this->db, $query ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$query.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
+	    if( mysqli_num_rows( $res ) > 0 ) {
+	        while( $row = mysqli_fetch_assoc( $res ) ) {
+	            $data[] = $row;
+	        }
+	    }
+	
+	    $data = ( ( $limit == 1 ) AND isset( $data[0] ) ) ? $data[0] : $data;
+	
+	    return $data;
+	}	
+	
+	/**
+	 * Get by Columns & Values
+	 *
+	 * @param	array	$attribues
+	 * @param	int		$limit
+	 * @param	int		$offset
+	 * @param	array	$orderBy
+	 * @return	array
+	 */
+	public function getByAttr( $attributes = array(), $limit = 1, $offset = 0, $orderBy = array() )
+	{
+	    return $this->getBy( $attributes = array(), $limit = 1, $offset = 0, $orderBy = array() );
 	}
 	
 	/**
@@ -246,32 +414,62 @@ class Db
 	 * @return	array
 	*/	
 	public function getBy( $attributes = array(), $limit = 1, $offset = 0, $orderBy = array() )
-	{		    
+	{
 		if( empty( $attributes ) OR !is_array( $attributes ) ) {
-			return false;	
+			return false;
 		}
-		
-	    // escape
-	    foreach( $attributes AS $key => $value ) {
-	        if( !is_integer( $value ) ) {
-	            $attributes[$key] = mysqli_real_escape_string( $this->db, $value );
-	        } else {
-	            $attributes[$key] = (int)$value;
-	        }
-	    }
+
+        // allowed operators
+        $validOperators = array(
+            '=',
+            '!=',
+            '<>',
+            '<=>',
+            '<',
+            '>',
+            '>=',
+            '<=',
+            'IS NULL',
+            'IS NOT NULL',
+            'LIKE',
+            'NOT LIKE',
+            'REGEXP'
+        );
+
+        // escape
+        foreach( $attributes AS $key => $value ) {
+            if( !in_array( $value['operator'], $validOperators ) ) {
+                unset( $attributes[ $key ] );
+            } else {
+                $attributes[$key]['column']    = mysqli_real_escape_string( $this->db, $value['column'] );
+                $attributes[$key]['value']     = mysqli_real_escape_string( $this->db, $value['value'] );
+            }
+        }
 		
 		$i 			= 0;
 		$count		= count( $attributes );
 		
 		$query = "SELECT * FROM `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
 		$query .= "WHERE ";
-		foreach( $attributes AS $key => $value ) {
-			$i++;
-			$query .= "`".$key."` = '".$value."' ";
-			if( $i < $count ) {
-				$query .= " AND ";	
-			}
-		}
+
+        foreach( $attributes AS $key => $value ) {
+            $i++;
+
+            switch( $value['operator'] ) {
+                case 'IS NULL':
+                case 'IS NOT NULL':
+                    $query .= "`".$value['column']."` ".$value['operator']." ";
+
+                break;
+
+                default:
+                    $query .= "`".$value['column']."` ".$value['operator']." '".$value['value']."' ";
+            }
+
+            if( $i < $count ) {
+                $query .= " AND ";
+            }
+        }
 		
 		if( !empty( $orderBy ) ) {
 			$count 	= count( $orderBy );
@@ -311,6 +509,194 @@ class Db
 		
 		return $data;
 	}
+
+    /**
+     * Get by Columns & Values
+     *
+     * @param	array	$attribues
+     * @param   array   $columns
+     * @param	int		$limit
+     * @param	int		$offset
+     * @param	array	$orderBy
+     * @return	array
+     */
+    public function getColumnsBy( $attributes = array(), $columns = array(), $limit = 1, $offset = 0, $orderBy = array() )
+    {
+        if( empty( $attributes ) OR !is_array( $attributes ) ) {
+            return false;
+        }
+
+        if( empty( $columns ) OR !is_array( $columns ) ) {
+            return false;
+        }
+
+        // allowed operators
+        $validOperators = array(
+            '=',
+            '!=',
+            '<>',
+            '<',
+            '>',
+            '>=',
+            '<=',
+            'LIKE',
+            'NOT LIKE',
+        );
+
+        // escape
+        foreach( $attributes AS $key => $value ) {
+            if( !in_array( $value['operator'], $validOperators ) ) {
+                unset( $attributes[ $key ] );
+            } else {
+                $attributes[$key]['column']    = mysqli_real_escape_string( $this->db, $value['column'] );
+                $attributes[$key]['value']     = mysqli_real_escape_string( $this->db, $value['value'] );
+            }
+        }
+
+        $i 			= 0;
+        $count		= count( $attributes );
+
+        $query = "SELECT ";
+
+        $columnCount    = count( $columns );
+        $columnIterator = 0;
+
+        foreach( $columns AS $key => $value ) {
+            $columnIterator++;
+            $query .= "`".mysqli_real_escape_string( $this->db, $value )."` ";
+
+            if( $columnIterator < $columnCount ) {
+                $query .= ", ";
+            }
+        }
+
+        $query .= "FROM `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
+        $query .= "WHERE ";
+
+        foreach( $attributes AS $key => $value ) {
+            $i++;
+
+            $query .= "`".$value['column']."` ".$value['operator']." '".$value['value']."' ";
+
+            if( $i < $count ) {
+                $query .= " AND ";
+            }
+        }
+
+        if( !empty( $orderBy ) ) {
+            $count 	= count( $orderBy );
+            $i		= 0;
+
+            $query .= "ORDER BY ";
+            foreach( $orderBy AS $orderKey => $orderValue ) {
+                $i++;
+
+                $query .= "`".mysqli_real_escape_string( $this->db, $orderKey )."` ";
+                $query .= mysqli_real_escape_string( $this->db, $orderValue )." ";
+
+                if( $i < $count ) {
+                    $query .= ", ";
+                }
+            }
+        }
+
+        $limit	= (int)$limit;
+        $offset = (int)$offset;
+        $data	= array();
+
+        if( ( $limit > 0 ) AND ( $offset >= 0 ) ) {
+            $query .= "LIMIT ".$offset.", ".$limit;
+        } elseif ( $limit == 1 ) {
+            $query .= "LIMIT 1 ";
+        }
+
+        $res = mysqli_query( $this->db, $query ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$query.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
+        if( mysqli_num_rows( $res ) > 0 ) {
+            while( $row = mysqli_fetch_assoc( $res ) ) {
+                $data[] = $row;
+            }
+        }
+
+        $data = ( ( $limit == 1 ) AND isset( $data[0] ) ) ? $data[0] : $data;
+
+        return $data;
+    }
+
+
+    /**
+     * Get by Columns & Values
+     * using RegEx
+     *
+     * @param	array	$attribues
+     * @param	int		$limit
+     * @param	int		$offset
+     * @param	array	$orderBy
+     * @return	array
+     */
+    public function getByRegex( $attributes = array(), $limit = 1, $offset = 0, $orderBy = array() )
+    {
+        if( empty( $attributes ) OR !is_array( $attributes ) ) {
+            return false;
+        }
+
+        // escape
+        foreach( $attributes AS $key => $value ) {
+            $attributes[$key] = mysqli_real_escape_string( $this->db, $value );
+        }
+
+        $i      = 0;
+        $count  = count( $attributes );
+
+        $query = "SELECT * FROM `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
+        $query .= "WHERE ";
+
+        foreach( $attributes AS $key => $value ) {
+            $i++;
+            $query .= "`".$key."` REGEXP '".$value."' ";
+
+            if( $i < $count ) {
+                $query .= " AND ";
+            }
+        }
+
+        if( !empty( $orderBy ) ) {
+            $count 	= count( $orderBy );
+            $i		= 0;
+
+            $query .= "ORDER BY ";
+            foreach( $orderBy AS $orderKey => $orderValue ) {
+                $i++;
+
+                $query .= "`".mysqli_real_escape_string( $this->db, $orderKey )."` ";
+                $query .= mysqli_real_escape_string( $this->db, $orderValue )." ";
+
+                if( $i < $count ) {
+                    $query .= ", ";
+                }
+            }
+        }
+
+        $limit	= (int)$limit;
+        $offset = (int)$offset;
+        $data	= array();
+
+        if( ( $limit > 0 ) AND ( $offset >= 0 ) ) {
+            $query .= "LIMIT ".$offset.", ".$limit;
+        } elseif ( $limit == 1 ) {
+            $query .= "LIMIT 1 ";
+        }
+
+        $res = mysqli_query( $this->db, $query ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$query.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
+        if( mysqli_num_rows( $res ) > 0 ) {
+            while( $row = mysqli_fetch_assoc( $res ) ) {
+                $data[] = $row;
+            }
+        }
+
+        $data = ( ( $limit == 1 ) AND isset( $data[0] ) ) ? $data[0] : $data;
+
+        return $data;
+    }
 	
 	/**
 	 * Get all records 
@@ -378,47 +764,91 @@ class Db
 	
 	    return mysqli_insert_id( $this->db );
 	}
-
+	
 	/**
-	 * Delete by columns & values
+	 * Replace by ID
 	 *
-	 * @param	array	$attributes  
-	 * @param	int		$limit
-	 * @return	int
-	*/
-	public function deleteByAttr( $attributes = array(), $limit = 1 )
+	 * @param  int     $id
+	 * @param  array   $data
+	 * @return mixed
+	 */
+	public function replaceById( $id = 0, $data = array() )
 	{
-		if( empty( $attributes ) OR !is_array( $attributes ) ) {
-			return false;
-		}
-		
-		// escape
-		foreach( $attributes AS $key => $value ) {
-			$attributes[$key] = mysqli_real_escape_string( $this->db, $value );
-		}
-				
-	    $limit = (int)$limit;
+	    if( empty( $data ) ) {
+	        return false;
+	    }
 	    
-	    $sql = "DELETE FROM ";
-	    $sql .= " `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
-	    $sql .= "WHERE `".mysqli_real_escape_string( $this->db, $name )."` ";
-	    
-	    foreach( $attributes AS $key => $value ) {
-	    	$i++;
-	    	$query .= "`".$key."` = '".$value."' ";
-	    	if( $i < $count ) {
-	    		$query .= " AND ";
-	    	}
-	    }	    
-	    
-	    if( $limit >= 1 ) {
-	        $sql .= "LIMIT ";
-	        $sql .= " = '".mysqli_real_escape_string( $this->db, $limit ) ."' ";
+	    $id = (int)$id;
+	    if( $id == 0 ) {
+	        return false;
 	    }
 	
+	    // get column names for filtering
+	    $columnNames = fetchColumns( $this->tableName );
+	
+	    // filter
+	    foreach( $data AS $key => $value ) {
+	        if( !in_array( $key, $columnNames ) ) {
+	            unset( $data[$key] );
+	        }
+	    }
+	
+	    // check after filtering
+	    if( empty( $data ) ) {
+	        return false;
+	    }
+	
+	    $count	= count( $data );
+	    $i		= 0;
+	
+	    // start the query
+	    $sql = "REPLACE INTO `".$this->tableName."` ( ";
+	
+	    foreach( $data AS $key => $value ) {
+	        $i++;
+	        $comma = ( $i < $count ) ? ', ' : ' ';
+	        $key = mysqli_real_escape_string( $this->db, $key );
+	        $sql .= "`".mysqli_real_escape_string( $this->db, $key )."` ".$comma;
+	    }
+	
+	    $sql .= " ) VALUES ( ";
+	
+	    $i = 0;
+	    foreach( $data AS $key => $value ) {
+	        $i++;
+	        $comma = ( $i < $count ) ? ', ' : ' ';
+	        $value = mysqli_real_escape_string( $this->db, $value );
+	        $sql .= "'".mysqli_real_escape_string( $this->db, $value )."' ".$comma;
+	    }
+	
+	    $sql .= ");";
 	    $res = mysqli_query( $this->db, $sql ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$sql.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
 	
-	    return mysqli_affected_rows( $this->db, $res );
+	    return mysqli_affected_rows( $this->db );
+	}	
+
+	/**
+	 * Delete by ID
+	 *
+	 * @param	int	$id
+	 * @return	boolean
+	*/
+	public function deleteById( $id = 0 )
+	{
+	    $id = (int)$id;
+	    
+	    if( isZero( $id ) ) {
+	        return false;
+	    }
+
+	    $sql = "DELETE FROM ";
+	    $sql .= " `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
+	    $sql .= "WHERE `id` = '".mysqli_real_escape_string( $this->db, $id )."' ";
+	    $sql .= "LIMIT 1 ";
+		
+        $res = mysqli_query( $this->db, $sql ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$sql.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
+		
+		return mysqli_affected_rows( $this->db );		
 	}
 
 	/**
@@ -440,29 +870,12 @@ class Db
 	    
 	    if( $limit >= 1 ) {
 	        $sql .= "LIMIT ";
-	        $sql .= " = '".mysqli_real_escape_string( $this->db, $limit ) ."' ";
+	        $sql .= mysqli_real_escape_string( $this->db, $limit );
 	    }
 	
 	    $res = mysqli_query( $this->db, $sql ) OR die( '<pre>SQL Error:  '.mysqli_error( $this->db ).'<br>SQL:  '.$sql.'<br>File:  '.__FILE__.'<br>Line:  '.__LINE__ );
 	
-	    return mysqli_affected_rows( $this->db, $res );
-	}
-	
-	/**
-	 * Delete by ID
-	 *  
-	 * @param	integer $id
-	 * @return	integer
-	*/
-	public function deleteById( $id )
-	{
-		$sql = "DELETE FROM `".mysqli_real_escape_string( $this->db, $this->tableName )."` ";
-		$sql .= "WHERE `id` = '".mysqli_real_escape_string( $this->db, $id )."' ";
-		$sql .= "LIMIT 1 ";
-		
-		$res = mysqli_query( $this->db, $sql ) OR die( mysql_errori( $this->db )."\n".$sql );
-		
-		return mysqli_affected_rows( $this->db );		
+	    return mysqli_affected_rows( $this->db );
 	}	
 
 	/**
@@ -536,8 +949,12 @@ class Db
 	*/
 	public function getByUUID( $uuid )
 	{
-	    $data = $this->getBy( 
-	        array( 'uuid' => $uuid ) 
+	    $data = $this->getBy(
+	        array(
+	            'value'     => $uuid,
+                'column'    => 'uuid',
+                'operator'  => '='
+            )
         );
 	    
 	    if( !empty( $data ) ) {

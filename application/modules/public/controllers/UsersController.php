@@ -45,16 +45,38 @@ class UsersController extends Zend_Controller_Action
 			$json	= array();			
 			
 			switch( $method ) {
+			    case 'update':
+			        $result	= $this->_User->updateSelf( $_POST['data'] );
+			        if( $result > 0 ) {
+			            $json['status'] = 'OK';
+			        } else {
+			            $json['status'] = 'ERROR';
+			            $json['error']	= 'NOT_UPDATED';
+			        }
+			    
+			        break;
+			        
 				case 'userLogin':
-					$result	= $this->_User->login( $_POST['username'], $_POST['password'] );
+                    switch( SITE_LOGIN_TYPE ) {
+                        case 'email':
+                            $result = $this->_User->loginByEmail(
+                                $_POST['username']
+                            );
+
+                            break;
+
+                        default:
+                            $result = $this->_User->login(
+                                $_POST['username'],
+                                $_POST['password']
+                            );
+                    }
 						
-					if( $result == 'LOGIN_OK' ) {
-						$json['status'] = 'OK';
-					} else {
-						$json['status'] = 'ERROR';
-						$json['error']	= $result;
-					}
+                    // update the JSON
+                    $json = $result;
+					
 					break;
+					
 				case 'userLoginExternal':
 					$result	= $this->_User->loginExternal( $_POST['data'] );
 					if( $result == 'LOGIN_OK' ) {

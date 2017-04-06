@@ -16,7 +16,6 @@
 
 class User extends Db
 {
-	private $columnNames;
 	protected $_Language;
 	protected $_Usergroup;
 	protected $_Site_Permission;
@@ -26,18 +25,17 @@ class User extends Db
 	    $this->tableName = DB_TABLE_PREFIX.'user';	    
 	    parent::__construct( $this->tableName );
 
-	    $this->_columnNames       = fetchColumnNames( $this->tableName );
 		$this->_Language          = new Language;
 		$this->_Usergroup         = new Usergroup;
 		$this->_Site_Permission   = new Site_Permission;		
 	}
 	
-	/*
+	/**
 	 * Fetch DB Data for DataTables
-	*
-	* @link	http://datatables.net/release-datatables/examples/data_sources/server_side.html
-	* @param	array	$params
-	* @return	array
+	 *
+	 * @link	http://datatables.net/release-datatables/examples/data_sources/server_side.html
+	 * @param	array	$params
+	 * @return	array
 	*/
 	public function fetchDataForDataTables( $params )
 	{
@@ -47,12 +45,12 @@ class User extends Db
 	
 		extract( $params );
 	
-		/* Array of database columns which should be read and sent back to DataTables. Use a space where
+		/**
+		 * Array of database columns which should be read and sent back to DataTables. Use a space where
 		 * you want to insert a non-database field (for example a counter or static image)
 		*/
 		$aColumns = array(	
 		    'email',
-            'username',
             'site_language',
             'site_status',
             'date_created',
@@ -305,7 +303,7 @@ class User extends Db
 		return mysqli_affected_rows( $this->db );		
 	}
 	
-	public function fetchAllUsers( $columns = '*', $offset = 0, $limit = 20, $orderBy = 'username', $sortOrder = 'ASC' )
+	public function fetchAllUsers( $columns = '*', $offset = 0, $limit = 20, $orderBy = 'last_name', $sortOrder = 'ASC' )
 	{
 		$data		= array();		
 		$columns	= ( is_array( $columns ) ) ? implode(',', $columns ) : '*';
@@ -325,7 +323,7 @@ class User extends Db
 		return $data;		
 	}	
 	
-	private function confirmAccountById( $userId )
+	public function confirmAccountById( $userId )
 	{
 		$sql    = "UPDATE `".DB_TABLE_PREFIX."user` ";
 		$sql   .= "SET `site_status` = 'email_confirmed' ";
@@ -343,7 +341,7 @@ class User extends Db
 	
 	public function addUserToUsergroup( $userId, $usergroupId )
 	{
-		$sql	= "INSERT INTO  `".DB_TABLE_PREFIX."usergroup_member` ";
+		$sql	= "INSERT IGNORE INTO `".DB_TABLE_PREFIX."usergroup_member` ";
 		$sql   .= "( ";
 		$sql   .= "`user_id`, ";
 		$sql   .= "`usergroup_id` ";
@@ -394,10 +392,12 @@ class User extends Db
 		if( empty( $data ) ) {
 			return false;
 		}
+
+        $columnNames = fetchColumnNames( $this->tableName );
 		
 		// START:	filter input
 		foreach( $data AS $key => $value ) {
-			if( !in_array( $key, $this->_columnNames ) ) {
+			if( !in_array( $key, $columnNames ) ) {
 				unset( $data[$key] );	
 			}	
 		}
@@ -411,9 +411,8 @@ class User extends Db
 			return 'EMAIL_EXISTS';			
 		}
 		
-		if( $this->usernameExists( $data['username'] ) ) {
-			return 'USERNAME_EXISTS';
-		}		
+		// placeholder
+		$userId = 0;
 		
 		// START:	set user status
 		if( (int)SITE_MODERATE_NEW_USERS == 1 ) {
@@ -457,7 +456,7 @@ class User extends Db
 		$sql   .= ");";		
 		$res    = mysqli_query( $this->db, $sql ) OR die( mysqli_error( $this->db )."\nSQL:  ".$sql );
 		
-		$userId	= mysqli_insert_id();
+		$userId	= mysqli_insert_id( $this->db );
 		// END:		insert user into DB
 		
 		// START:	notify moderator, if required
@@ -475,10 +474,10 @@ class User extends Db
 		}
 		// END:		send e-mail, if required
 		
-		return 'OK';		
+		return $userId;		
 	}
 	
-	public function resetOwnPassword( $username, $recaptchaChallenge, $recaptchaResponse )
+	public function resetOwnPassword( $email, $recaptchaChallenge, $recaptchaResponse )
 	{
 		require_once('recaptcha-php/recaptchalib.php');
 		
@@ -493,13 +492,96 @@ class User extends Db
 			return $response->error;
 		}
 				
-		if( $this->usernameExists( $username ) ) {
-			$this->sendPasswordResetEmail( $username );
+		if( $this->emailExists( $email ) ) {
+			$this->sendPasswordResetEmail( $email );
 			return 'OK';	
 		}	
 
 		return 'USER_404';
 	}
+	
+	protected function sendLoginConfirmationEmail( $userId, $code, $email = null )
+	{
+	    require_once('PHPMailer/PHPMailerAutoload.php');
+	
+	    $mail = new PHPMailer;
+	    $user = $this->fetchUserDetailsById( $userId );
+
+        // e-mail override
+        if( !is_null( $email ) ) {
+            $user['email'] = $email;
+        }
+
+        // is SMTP
+        $mail->IsSMTP();
+        $mail->SMTPAuth = true;
+
+        // secure SMTP
+        $mail->SMTPSecure = 'tls';
+
+        // enables SMTP debug information (for testing)
+        // $mail->SMTPDebug = 2;
+
+        // sets the SMTP server
+        $mail->Host = SITE_MAILJET_SMTP_SERVER_HOST;
+
+        // set the SMTP port for the GMAIL server
+        $mail->Port = SITE_MAILJET_SMTP_SERVER_PORT;
+
+        // SMTP account username
+        $mail->Username = SITE_MAILJET_SMTP_USERNAME;
+
+        // SMTP account password
+        $mail->Password = SITE_MAILJET_SMTP_PASSWORD;
+
+	    $mail->From		= SITE_EMAIL_ADDRESS;
+	    $mail->FromName = SITE_NAME;
+	    
+	    if( strlen( trim( $user['first_name'] ) ) AND strlen( trim( $user['last_name'] ) ) ) {
+	        $mail->addAddress( $user['email'], $user['first_name'].' '.$user['last_name'] );	         
+	    } else {
+	        $mail->addAddress( $user['email'] );	         
+	    }
+	    
+	    $mail->addReplyTo( SITE_EMAIL_ADDRESS, SITE_NAME );
+	
+	    $mail->WordWrap = 50;
+	    $mail->isHTML( true );
+	
+	    $mail->Subject	= '['.SITE_NAME.'] Password-less Login';
+	
+	    if( strlen( trim( $user['first_name'] ) ) AND strlen( trim( $user['last_name'] ) ) ) {	         
+	       $body = 'Hello '.$user['first_name'].' '.$user['last_name'].', ';
+	    } else {
+	        $body = 'Hello, ';	         
+	    }
+	    
+	    $targetUrl     = BASEURL.'/login/confirm/code/'.$code;
+	    
+	    $body          .= '<br><br>Please confirm that you wish to log in to your account at '.SITE_NAME.' by following this URL:  ';
+	    $body    	   .= '<a href="'.$targetUrl.'">'.$targetUrl.'</a>';
+	
+	    $mail->Body		= $body;
+	    
+	    if( strlen( trim( $user['first_name'] ) ) AND strlen( trim( $user['last_name'] ) ) ) {
+	        $body = "Hello ".$user['first_name']." ".$user['last_name'].", ";	         
+	    } else {
+	        $body = "Hello, ";	         
+	    }
+	
+	    $body    	   .= "\r\n\r\nPlease confirm that you wish to log in to your account at ".SITE_NAME." by following this URL:  ";
+	    $body    	   .= $targetUrl;
+	
+	    $mail->AltBody = $body;
+	
+	    if( !$mail->send() ) {
+            file_put_contents( BASEDIR.'/data/logs/error/php/'.__FUNCTION__.'-'.date('Y-m-d').'.log', var_export( $mail->ErrorInfo, true ), FILE_APPEND );
+
+	        return $mail->ErrorInfo;
+	    }
+	
+	    return true;
+	}	
 	
 	protected function sendNewRegistrationEmail( $userId, $code )
 	{
@@ -516,7 +598,7 @@ class User extends Db
 		$mail->WordWrap = 50;
 		$mail->isHTML( true );
 	
-		$mail->Subject	= '['.SITE_NAME.'] Your New Account ('.$user['username'].')';
+		$mail->Subject	= '['.SITE_NAME.'] Your New Account ('.$user['first_name'].' '.$user['last_name'].')';
 	
 		$body			= 'Hello '.$user['first_name'].' '.$user['last_name'].', ';
 		$body    	   .= '<br><br>Please confirm your new account by following this URL:  ';
@@ -537,12 +619,12 @@ class User extends Db
 		return true;
 	}
 		
-	private function sendPasswordResetEmail( $username )
+	private function sendPasswordResetEmail( $email )
 	{
 		require_once('PHPMailer/PHPMailerAutoload.php');
 		
 		$mail = new PHPMailer;
-		$user = $this->fetchUserDetailsByUsername( $username );
+		$user = $this->fetchUserDetailsBy( 'email', $email );
 		
 		$code = randomString( 60 );
 		$this->addPasswordResetCode( $user['id'], $code );
@@ -718,25 +800,152 @@ class User extends Db
 		}
 		
 		return false;		
-	}	
+	}
+
+	public function loginByEmail( $email )
+    {
+        $userId         = 0;
+        $email          = trim( $email );
+        $emailDomain    = getDomainFromEmail( $email );
+        $allowedDomains = explode( ',', SITE_ALLOWED_EMAIL_DOMAINS );
+        
+        // check regex match
+        if( !preg_match( SITE_EMAIL_REGEX, $email ) ) {
+            return array(
+                'status'    => 'ERROR',
+                'error'     => 'INVALID_EMAIL_ADDRESS',
+                'details'   => $email
+            );            
+        }
+        
+        // check if valid domain
+        if( !in_array( $emailDomain, $allowedDomains ) ) {
+            return array(
+                'status'    => 'ERROR',
+                'error'     => 'INVALID_DOMAIN',
+                'details'   => $emailDomain
+            );
+        } else {
+            $exists = $this->emailExists( $email );
+            
+            if( !$exists ) {
+                // get the username
+                $username = getUsernameFromEmail( $email );
+
+                // START:   check for aliases
+                // @TODO    change this from hardcoded regex to
+                // a config variable in the DB
+                $existingRecord = $this->getByRegex(
+                    array(
+                        'email' => '^'.$username.'+@(etrusted|trustedshops)\\.(com|de)$'
+                    )
+                );
+                // END:     check for aliases
+
+                if( !empty( $existingRecord ) ) {
+                    $userId = $existingRecord['id'];
+                } else {
+                    $userId = $this->createUser(
+                        array(
+                            'uuid'          => uuid(),
+                            'email'         => $email,
+                            'password'      => randomString().' '.randomString(),
+                            'url_slug'      => randomString(),
+                            'signup_ip'     => getIp(),
+                            'date_created'  => time(),
+                            'last_ip'       => getIp(),
+                        )
+                    );
+                }
+            } else {
+                $data = $this->getBy(
+                    array(
+                        array(
+                            'value'     => $email,
+                            'column'    => 'email',
+                            'operator'  => '='
+                        )
+                    )
+                );
+
+                if( !empty( $data ) ) {
+                    $userId = $data['id'];
+                }
+            }
+            
+            if( $userId > 0 ) {
+                // init
+                $User_Confirm_Login = new User_Confirm_Login();
+                
+                // delete existing values
+                $User_Confirm_Login->deleteBy( 
+                    'user_id', 
+                    $userId,
+                    0
+                );
+                
+                // confirmation code
+                $code = randomString();
+                
+                // add new value
+                $result = (int)$User_Confirm_Login->insert(
+                    array(
+                        'user_id'           => $userId,
+                        'code'              => $code,
+                        'date_created'      => time(),
+                        'date_expiration'   => time() + SITE_LOGIN_CONFIRMATION_TIMEOUT
+                    )
+                );
+                
+                if( $result > 0 ) {
+                    $emailSend = $this->sendLoginConfirmationEmail( 
+                        $userId, 
+                        $code,
+                        $email
+                    );
+                    
+                    if( $emailSend ) {
+                        return array(
+                            'status'    => 'OK',
+                            'result'    => 'MUST_VERIFY'
+                        );                        
+                    } else {
+                        return array(
+                            'status'    => 'ERROR',
+                            'error'     => 'EMAIL_CONFIRMATION_SEND',
+                            'result'    => $emailSend
+                        );                        
+                    }
+                } else {
+                    return array(
+                        'status'    => 'ERROR',
+                        'result'    => 'DB_TABLE'
+                    );
+                }                
+            } else {
+                return array(
+                    'status'    => 'ERROR',
+                    'result'    => 'USER_DOES_NOT_EXIST'
+                );                
+            }
+        }
+    }
 	
     /**
      * User Login
      *
-     * @param   string  $username
+     * @param   string  $email
      * @param	string	$password
      * @return  string
     */
-    public function login( $username, $password )
+    public function login( $email, $password )
     {
-    	if( !$this->usernameExists( $username ) ) {
-    		return 'LOGIN_USERNAME_DOES_NOT_EXIST';	
+    	if( !$this->emailExists( $email ) ) {
+    		return 'ACCOUNT_DOES_NOT_EXIST';	
     	} 
     		    	
         $sql    = "SELECT * FROM `".DB_TABLE_PREFIX."user` ";
-        $sql   .= "WHERE `username` = '".mysqli_real_escape_string( $this->db, $username )."' ";
-        $sql   .= "AND `password` = '".mysqli_real_escape_string( $this->db, $password )."' ";
-        $sql   .= "OR `email` = '".mysqli_real_escape_string( $this->db, $username )."' ";
+        $sql   .= "WHERE `email` = '".mysqli_real_escape_string( $this->db, $email )."' ";
         $sql   .= "AND `password` = '".mysqli_real_escape_string( $this->db, $password )."' ";
         $sql   .= "LIMIT 1 ";
 
@@ -780,7 +989,7 @@ class User extends Db
             } elseif ( !urlExists(  $_SESSION['user']['avatar_url'] ) ) {
             	 $_SESSION['user']['avatar_url'] = SITE_DEFAULT_AVATAR_URL;
             }
-            $_SESSION['user']['profile_url'] 	= BASEURL.'/'.$_SESSION['user']['username'];
+            $_SESSION['user']['profile_url'] 	= BASEURL.'/'.$_SESSION['user']['url_slug'];
             $_SESSION['user']['full_name'] 		= $_SESSION['user']['first_name'].' '.$_SESSION['user']['last_name'];
             
             // remove the user's password from the session
@@ -801,15 +1010,45 @@ class User extends Db
     {  
     	$_SESSION['user']['logged_in']	= true;    	
     	$_SESSION['user']['external']	= $data;
+
     	return 'LOGIN_OK';	
     }
+    
+    /**
+     * Fetch User Data via UUID
+     *
+     * @param   string  $uuid
+     * @return  array
+    */
+    public function fetchUserDetailsByUUID( $uuid )
+    {
+        $sql    = "SELECT * FROM `".DB_TABLE_PREFIX."user` ";
+        $sql   .= "WHERE `uuid` = '".mysqli_real_escape_string( $this->db, $uuid )."' ";
+        $sql   .= "LIMIT 1 ";
+    
+        $res    = mysqli_query( $this->db, $sql ) OR die( mysqli_error( $this->db ).'<br>'.$sql );
+    
+        if( mysqli_num_rows( $res ) > 0 ) {
+            $data = mysqli_fetch_assoc( $res );
+    
+            if( !strlen( trim( $data['avatar_url'] ) ) ) {
+                $data['avatar_url'] = SITE_DEFAULT_AVATAR_URL;
+            } elseif ( !urlExists( $data['avatar_url'] ) ) {
+                $data['avatar_url'] = SITE_DEFAULT_AVATAR_URL;
+            }
+    
+            return $data;
+        } else {
+            return array();
+        }
+    }    
     
     /**
      * Fetch User Data via User ID
      *
      * @param   string  $userId
      * @return  array
-     */
+    */
     public function fetchUserDetailsById( $userId )
     {
     	$sql    = "SELECT * FROM `".DB_TABLE_PREFIX."user` ";
@@ -839,16 +1078,18 @@ class User extends Db
     } 
     
     /**
-     * Fetch User Data via Username
+     * Fetch User Data via 
+     * Custom Criteria
      *
-     * @param   string  $username
+     * @param   string  $key
+     * @param	string	$value
      * @return  array
      */
-    public function fetchUserDetailsByUsername( $username )
+    public function fetchUserDetailsBy( $key, $value )
     {    		
     	$sql    = "SELECT * FROM `".DB_TABLE_PREFIX."user` ";
-    	$sql   .= "WHERE `username` = '".mysqli_real_escape_string( $this->db, $username )."' ";
-    	$sql   .= "OR `email` = '".mysqli_real_escape_string( $this->db, $username )."' ";
+    	$sql   .= "WHERE `".mysqli_real_escape_string( $this->db, $key )." ";
+    	$sql   .= " = '".mysqli_real_escape_string( $this->db, $value )."' ";
     	$sql   .= "LIMIT 1";
     
     	$res    = mysqli_query( $this->db, $sql ) OR die( mysqli_error( $this->db ).'<br>'.$sql );
@@ -875,14 +1116,15 @@ class User extends Db
     }
 
     /**
-     * Fetch Username via User ID
+     * Fetch a User's Name 
+     * via User ID
      *
      * @param   string  $userId
      * @return  string
      */
     public function fetchUsernameById( $userId )
     {
-    	$sql    = "SELECT `username` FROM `".DB_TABLE_PREFIX."user` ";
+    	$sql    = "SELECT `first_name`, `last_name`  FROM `".DB_TABLE_PREFIX."user` ";
     	$sql   .= "WHERE `id` = '".mysqli_real_escape_string( $this->db, $userId )."' ";
     	$sql   .= "LIMIT 1 ";
     
@@ -890,7 +1132,7 @@ class User extends Db
     
     	if( mysqli_num_rows( $res ) > 0 ) {
     		$data = mysqli_fetch_assoc( $res );
-    		return $data['username'];
+    		return $data['first_name'].' '.$data['last_name'];
     	}
     }
 
@@ -915,16 +1157,18 @@ class User extends Db
     }    
 
     /**
-     * Determine if a username exists or not
+     * Determine if a specific
+     * key & value exists or not
      *
-     * @param   string	$username
+     * @param   string	$key
+     * @param	string	$value
      * @return  boolean	
     */
-    public function usernameExists( $username )
+    public function valueExists( $key, $value )
     {
         $sql    = "SELECT * FROM `".DB_TABLE_PREFIX."user` ";
-        $sql   .= "WHERE `username` = '".mysqli_real_escape_string( $this->db, $username )."' ";
-        $sql   .= "OR `email` = '".mysqli_real_escape_string( $this->db, $username )."' ";
+        $sql   .= "WHERE `".mysqli_real_escape_string( $this->db, $key )."` ";
+        $sql   .= " = '".mysqli_real_escape_string( $this->db, $value )."' ";
         $sql   .= "LIMIT 1 ";
 
         $res    = mysqli_query( $this->db, $sql ) OR die( mysqli_error( $this->db ).'<br>'.$sql );
@@ -949,8 +1193,9 @@ class User extends Db
     	$sql   .= "LIMIT 1 ";
     
     	$res    = mysqli_query( $this->db, $sql ) OR die( mysqli_error( $this->db ).'<br>'.$sql );
-    
-    	if( mysqli_num_rows( $res ) > 0 ) {
+        $count  = mysqli_num_rows( $res );       
+    	
+    	if( $count > 0 ) {
     		return true;
     	}
     
@@ -991,7 +1236,7 @@ class User extends Db
             	 $_SESSION['user']['avatar_url'] = SITE_DEFAULT_AVATAR_URL;
             }            
                         
-            $_SESSION['user']['profile_url']	= BASEURL.'/'.$_SESSION['user']['username'];
+            $_SESSION['user']['profile_url']	= BASEURL.'/'.$_SESSION['user']['url_slug'];
             $_SESSION['user']['full_name'] 		= $_SESSION['user']['first_name'].' '.$_SESSION['user']['last_name'];
             
             // remove the user's password from the session
@@ -1072,7 +1317,7 @@ class User extends Db
     
             $count	= count( $data );
     
-            $sql    = "UPDATE `".DB_TABLE_PREFIX.".$this->tableName.` ";
+            $sql    = "UPDATE `".$this->tableName."` ";
             $sql   .= "SET ";
             $i		= 0;
             
@@ -1099,10 +1344,13 @@ class User extends Db
     
     public function updateUserById($id, $data)
     {
-    	if( !empty( $data ) ) {    		
+    	if( !empty( $data ) ) {
+
+            $columnNames = fetchColumnNames( $this->tableName );
+
     		// START:	filter input
     		foreach( $data AS $key => $value ) {
-    			if( !in_array( $key, $this->_columnNames ) ) {
+    			if( !in_array( $key, $columnNames ) ) {
     				unset( $data[$key] );
     			}
     		}

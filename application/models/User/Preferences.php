@@ -20,7 +20,7 @@ class User_Preferences extends Db
 	
 	public function __construct()
 	{
-	    $this->tableName = DB_TABLE_PREFIX.'user_prefs';
+	    $this->tableName = DB_TABLE_PREFIX.'user_preferences';
 	    parent::__construct( $this->tableName );
 	}
 	
@@ -71,9 +71,17 @@ class User_Preferences extends Db
 	        foreach( $data AS $key => $value ) {
 	           $exists = $this->getBy( 
 	               array(
-                       'name'       => $key,
-	                   'user_id'    => $userId
-	               ) 
+                       array(
+                           'column'     => 'name',
+                           'value'      => $key,
+                           'operator'   => '=',
+                       ),
+                       array(
+                           'column'     => 'user_id',
+                           'value'      => $userId,
+                           'operator'   => '=',
+                       )
+                   )
 	           );
 	           
 	           if( $exists ) {

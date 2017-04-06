@@ -1,5 +1,6 @@
-$(document).ready(function() {				
-	$.blockUI.defaults.message = '<img border="0" src="'+ DEFAULT_PRELOADER_IMAGE + '">';
+$(document).ready(function() {
+
+	$.blockUI.defaults.message = DEFAULT_PRELOADER_IMAGE;
 	$.blockUI.defaults.baseZ = 50000;
 	$.blockUI.defaults.css = { 
         padding: 0,
@@ -16,4 +17,5 @@ $(document).ready(function() {
 		opacity:         0.6, 
 		cursor:          'wait'
 	};
+
 });

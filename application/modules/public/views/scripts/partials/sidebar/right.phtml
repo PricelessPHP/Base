@@ -1,0 +1,28 @@
+<?php
+    $User       = new User;
+    $userCount  = $User->count();
+?>
+<div id="panel-site-stats">
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">
+            <i class="fa fa-bar-chart" aria-hidden="true"></i> <?php echo translate('stats'); ?>
+        </div>
+        
+		<div class="panel-body">
+			<div class="table-responsive">
+				<table class="table table-condensed">
+					<tr>
+						<td style="border-top: 0;">
+							<?php echo translate('total_users'); ?>
+						</td>
+						
+						<td style="border-top: 0;">
+							<?php echo $userCount; ?>
+						</td>
+					</tr>					
+				</table>
+			</div> 		
+		</div>        
+    </div>
+</div>

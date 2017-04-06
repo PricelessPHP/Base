@@ -1,0 +1,97 @@
+<div>
+    <table class="table table-condensed">
+    	<tr>
+    		<td style="border-top: 0;  padding: 0;">
+    			<?php echo translate('date_proposed'); ?>
+    		</td>
+    		
+    		<td style="border-top: 0; padding: 0;">
+    			<span title="<?php echo date( SITE_DEFAULT_DATE_FORMAT, $this->idea['date'] ); ?>" data-livestamp="<?php echo $this->idea['date']; ?>">
+					<i class="fa fa-spinner fa-pulse fa-fw"></i> <span class="sr-only"><?php echo translate('loading'); ?>...</span>    			
+    			</span>
+    		</td>
+    	</tr>
+    	
+    	<tr>
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php echo translate('status'); ?>
+    		</td>
+    		
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php 
+    			    switch( $this->idea['state'] ) {
+    			        case 'implemented':
+    			            $class = 'success';
+    			            
+    			            break;
+    			            
+    			        default:
+    			            $class = 'info';
+    			    }
+    			?>
+    			<span class="label label-<?php echo $class; ?>">
+    				<?php echo strtoupper( translate( $this->idea['state'] ) ); ?>
+    			</span>
+    		</td>
+    	</tr>
+
+        <tr>
+            <td style="border-top: 0;  padding: 1px;">
+                <?php echo translate('category'); ?>
+            </td>
+
+            <td style="border-top: 0;  padding: 1px;">
+                <?php if( !empty( $this->idea['category_names'] ) ): ?>
+                    <?php
+                        $categoryCount      = count( $this->idea['category_names'] );
+                        $categoryIterator   = 0;
+
+                        foreach( $this->idea['category_names'] AS $key => $value ):
+                    ?>
+                        <?php $categoryIterator++; ?>
+                        <a href="<?php echo PROTOCOL_RELATIVE_URL.'/category/'.$value['url_slug']; ?>">
+                            <?php echo translate( $value['name'] ); ?>
+                        </a>
+                        <?php if( $categoryIterator < $categoryCount ): ?>
+                        ,&nbsp;
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <a href="<?php echo PROTOCOL_RELATIVE_URL.'/category/uncategorized'; ?>">
+                        <?php echo translate('uncategorized'); ?>
+                    </a>
+                <?php endif; ?>
+            </td>
+        </tr>
+    	
+    	<tr>
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php echo translate('comments'); ?>
+    		</td>
+    		
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php echo count( $this->idea['comments'] ); ?>
+    		</td>
+    	</tr>
+    	
+    	<tr>
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php echo translate('votes'); ?>
+    		</td>
+    		
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php echo $this->idea['vote_data']['count']; ?>
+    		</td>
+    	</tr>    	    	
+    	
+    	<tr>
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php echo translate('views'); ?>
+    		</td>
+    		
+    		<td style="border-top: 0;  padding: 1px;">
+    			<?php echo $this->idea['views']; ?>
+    		</td>
+    	</tr>					
+    </table>
+</div>

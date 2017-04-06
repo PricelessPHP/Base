@@ -69,6 +69,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         $this->_updateUserSession();
         $this->_checkUpgrade();
         $this->_setupFirePHP();
+
+        // check if online
+        $this->_checkOffline();
+        
+        $this->_checkRequiredData();
     }
     
     private function _checkInstall()
@@ -92,6 +97,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 			'upgrade',
     		'users'
     	);
+    	
     	$allowed = false;
     	if( file_exists( BASEDIR.'/data/temp/.upgrade' ) ) {
     		foreach( $allowedPaths AS $key => $value ) {
@@ -99,6 +105,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     				$allowed = true;
     			}    			
     		}
+    		
     		if( !$allowed ) {
     			header('Location: '.BASEURL.'/upgrade');
     		}
@@ -158,24 +165,24 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     private function _setupSessionParams()
     {
         // until the end of time...
-        // @link	http://en.wikipedia.org/wiki/Year_2038_problem
+        // @link    https://en.wikipedia.org/wiki/Year_2038_problem
+        $epochEnd = 2147483647 - time();
+
         if( !defined('COOKIE_TIMEOUT') ) {
-            define( 'COOKIE_TIMEOUT', 2147483647 );
+            define( 'COOKIE_TIMEOUT', ( $epochEnd ) );
         }
 
         if( !defined('GARBAGE_TIMEOUT') ) {
             define( 'GARBAGE_TIMEOUT', COOKIE_TIMEOUT );
         }
 
+        ini_set( 'session.cookie_domain', SITE_COOKIE_DOMAIN );
         ini_set( 'session.gc_maxlifetime', GARBAGE_TIMEOUT );
-        session_set_cookie_params( COOKIE_TIMEOUT, '/' );
+                
+        session_set_cookie_params( COOKIE_TIMEOUT, '/', SITE_COOKIE_DOMAIN );
 
         // setting session dir
-        if( isset( $_SERVER['HTTP_HOST'] ) ) {
-            $sessdir = '/tmp/'.$_SERVER['HTTP_HOST'];
-        } else {
-            $sessdir = '/tmp/BizLogic';
-        }
+        $sessdir = '/tmp/'.SITE_SESSION_NAME;
 
         // if session dir not exists, create directory
         if ( !is_dir( $sessdir ) ) {
@@ -186,6 +193,19 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         if( is_dir( $sessdir ) ) {
             ini_set( 'session.save_path', $sessdir );
         }
+    }
+    
+    private function _setupSessionHandler()
+    {
+        $Session_Db_Mysql = new Session_Db_Mysql;
+        session_set_save_handler(
+            array( $Session_Db_Mysql, '_open' ),
+            array( $Session_Db_Mysql, '_close' ),
+            array( $Session_Db_Mysql, '_read' ),
+            array( $Session_Db_Mysql, '_write' ),
+            array( $Session_Db_Mysql, '_destroy' ),
+            array( $Session_Db_Mysql, '_gc' )
+        );
     }
 
     private function _setupSiteConfig()
@@ -200,6 +220,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     private function _setupSession()
     {
         $this->_setupSessionParams();
+        $this->_setupSessionHandler();
 
         if( !isset( $_SESSION ) ) {
             session_start();
@@ -255,8 +276,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     {        
     	global $SITE_LANGUAGES; 
 	   	
-        $Language	= new Language();
-        $SITE_LANGUAGES		= $Language->fetchActiveLanguages();
+        $Language       = new Language();
+        $SITE_LANGUAGES = $Language->fetchActiveLanguages();
         
         if( isset( $_SESSION['user']['lang_override'] ) ) {
         	if( $_SESSION['user']['lang_override'] ) {
@@ -276,6 +297,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         	$_SESSION['user']['language_id']	= ( (int)$_SESSION['user']['language_id'] == 0 ) ? $siteDefaultLanguageId : $_SESSION['user']['language_id'];
         	$_SESSION['user']['site_language']	= $_SESSION['user']['language_id'];
         }
+        
+        $_SESSION['user']['selected_locale'] = $Language->getById( $_SESSION['user']['language_id'] );
+        $_SESSION['user']['selected_locale'] = $_SESSION['user']['selected_locale']['iso_639'];
         
         $siteDefaultPhrases				= $Language->fetchPhrasesByLanguageId( $siteDefaultLanguageId );
         $_SESSION['site']['phrases']	= $Language->fetchPhrasesByLanguageId( $_SESSION['user']['language_id'] );
@@ -299,6 +323,40 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
         Zend_Registry::set( 'RUN_ENV', $env );
     }
     
+    protected function _checkRequiredData()
+    {
+        $_SESSION['user']['required_data'] = array();
+        
+        $requiredData = explode( ',', SITE_REQUIRED_USER_DATA );
+        
+        foreach( $requiredData AS $key => $value ) {
+            if( !strlen( @$_SESSION['user'][ $value ] ) ) {
+                $_SESSION['user']['required_data'][] = $value;
+            }
+        }
+        
+        if( !empty( $_SESSION['user']['required_data'] ) ) {
+            $allowedPaths = array(
+                'ajax',
+                'login',
+                'logout',
+                'mandatory',
+                'users',
+            );
+             
+            $allowed = false;
+            foreach( $allowedPaths AS $key => $value ) {
+                if( preg_match('/'.$value.'/', $_SERVER['REQUEST_URI'] ) ) {
+                    $allowed = true;
+                }
+            }
+            
+            if( !$allowed ) {
+                header('Location: '.BASEURL.'/profile/mandatory');
+            }   
+        }
+    }
+    
     protected function _updateUserSession()
     {    	 	
     	global $BOOTSTRAP_THEMES;
@@ -306,8 +364,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     	// we want to update the user session on every page hit
     	$User = new User();		
     	$User->updateUserSession();
+
     	if( !isset( $_COOKIE['theme'] ) ) {
-    		setcookie( 'theme', SITE_DEFAULT_TEMPLATE, ( time() + SITE_COOKIE_EXPIRATION_DATE ) );    		
+    		setcookie( 'theme', SITE_DEFAULT_TEMPLATE, ( time() + SITE_COOKIE_EXPIRATION_DATE ), SITE_COOKIE_PATH, SITE_COOKIE_DOMAIN );    		
     	}
     	
     	// user theme
@@ -455,6 +514,103 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     			// END:		FirePHP    			
     		} 		
     	}
+    }
+
+    protected function _checkOffline()
+    {
+        if( (int)SITE_OFFLINE == 1 AND !has_permission('can_view_offline_site') ) {
+            $allowedPaths = array(
+                'ajax',
+                'login',
+                'users'
+            );
+
+            $allowed = false;
+
+            foreach( $allowedPaths AS $key => $value ) {
+                if( preg_match('/'.$value.'/', $_SERVER['REQUEST_URI'] ) ) {
+                    $allowed = true;
+                }
+            }
+
+            if( !$allowed ) {
+                $html = file_get_contents( VIEWS_DIR.'/error/static/error.phtml' );
+                $html = str_replace( '__SITE_NAME__', SITE_NAME, $html );
+                $html = str_replace( '__ERROR_MESSAGE__', SITE_OFFLINE_NOTICE, $html );
+                $html = str_replace( '__THEME_PATH__', PROTOCOL_RELATIVE_URL.'/'.SITE_LOCAL_THEME_URL_ROOT.'/'.SITE_DEFAULT_TEMPLATE, $html );
+                $html = str_replace( '__JS_PATH__', PROTOCOL_RELATIVE_URL.'/js', $html );
+                $html = str_replace( '__PROTOCOL_RELATIVE_URL__', HTTPS_URL, $html );
+                $html = str_replace( '__BASEURL__', PROTOCOL_RELATIVE_URL, $html );
+                $html = str_replace( '__SITE_DEFAULT_PRELOADER_IMAGE_PATH__', SITE_DEFAULT_PRELOADER_IMAGE_PATH, $html );
+
+                exit( $html );
+            }
+        }
+    }
+
+    protected function _setupIdeaCategories()
+    {
+        global $_IDEA_CATEGORY;
+
+        // START:   categories
+        $Idea_Category          = new Idea_Category();
+        $categories             = $Idea_Category->getAll();
+        $categoriesTranslated   = array_map( 'translate', array_column( $categories, 'name' ) );
+        $sortMe                 = array();
+
+        foreach( $categories AS $key => $value ) {
+            $categories[ $key ]['name'] = $categoriesTranslated[ $key ];
+
+            // sort array
+            $sortMe[ $key ] = $categoriesTranslated[ $key ];
+        }
+
+        // sort
+        array_multisort( $sortMe, SORT_LOCALE_STRING, $categories );
+
+        // assign
+        $_IDEA_CATEGORY = $categories;
+        // END:     categories
+    }
+
+    protected function _setupIdeaStatuses()
+    {
+        global $_IDEA_STATUS;
+
+        // private options
+        $privateStatus = array(
+            'deleted'
+        );
+
+        // START:   get status types
+        $statusOptions = get_enum_values( DB_TABLE_PREFIX.'user_status', 'state' );
+
+        // remove private options
+        foreach( $statusOptions AS $key => $value ) {
+            if( in_array( $value, $privateStatus ) ) {
+                unset( $statusOptions[ $key ] );
+            }
+        }
+
+        // translate
+        $statusOptionsTranslated    = array_map( 'translate', $statusOptions );
+        $sortMe                     = array();
+
+        foreach( $statusOptions AS $key => $value ) {
+            $statusOptions[ $key ]          = array();
+            $statusOptions[ $key ]['name']  = $value;
+            $statusOptions[ $key ]['text']  = $statusOptionsTranslated[ $key ];
+
+            // sort array
+            $sortMe[ $key ] = $statusOptionsTranslated[ $key ];
+        }
+
+        // sort
+        array_multisort( $sortMe, SORT_LOCALE_STRING, $statusOptions );
+
+        // assign
+        $_IDEA_STATUS = $statusOptions;
+        // END:     get status types
     }
     
     protected function noPerms()
