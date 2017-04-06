@@ -11,7 +11,7 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
 --
--- Database: `base_xnami_demo`
+-- Database: `base`
 --
 
 -- --------------------------------------------------------
@@ -1008,7 +1008,9 @@ INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `categ
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(91, 'site_global_html_header', NULL, NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(92, 'site_global_html_body_start', NULL, NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(93, 'site_global_html_body_end', NULL, NULL, 'global', 'text', '1', NULL, NULL);
-INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(NULL, 'site_default_time_zone', 'UTC', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(94, 'site_default_time_zone', 'UTC', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(95, 'site_cookie_domain', NULL, NULL , 'global', 'text', '1', NULL , NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(96, 'site_session_name', 'priceless', NULL , 'global', 'text', '1', NULL , NULL);
 
 -- --------------------------------------------------------
 
@@ -1242,6 +1244,81 @@ CREATE TABLE IF NOT EXISTS `base_user_prefs` (
   KEY `user_id` (`user_id`),
   KEY `name` (`name`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ;
+
+--
+-- Table structure for table `base_user_preferences`
+--
+
+CREATE TABLE IF NOT EXISTS `base_user_preferences` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `value` text COLLATE utf8_unicode_ci,
+  PRIMARY KEY (`id`),
+  KEY `parent_uuid` (`user_id`),
+  KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `base_user_required_data`
+--
+
+CREATE TABLE IF NOT EXISTS `base_user_required_data` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `value` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `value` (`value`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=3 ;
+
+--
+-- Dumping data for table `base_user_required_data`
+--
+
+INSERT INTO `base_user_required_data` (`id`, `value`) VALUES(1, 'first_name');
+INSERT INTO `base_user_required_data` (`id`, `value`) VALUES(2, 'last_name');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `base_user_session`
+--
+
+CREATE TABLE IF NOT EXISTS `base_user_session` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(10) unsigned DEFAULT NULL,
+  `session_id` varchar(32) COLLATE utf8_unicode_ci NOT NULL,
+  `data` text COLLATE utf8_unicode_ci,
+  `ip` varchar(15) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8_unicode_ci,
+  `date_created` int(10) unsigned NOT NULL,
+  `date_last_update` int(11) unsigned NOT NULL,
+  `date_expiration` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `session_id` (`session_id`),
+  KEY `date_last_update` (`date_last_update`),
+  KEY `ip` (`ip`),
+  KEY `user_id` (`user_id`),
+  KEY `date_created` (`date_created`),
+  KEY `date_expiration` (`date_expiration`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;
+
+--
+-- Dumping data for table `base_user_session`
+--
+
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `base_user_preferences`
+--
+ALTER TABLE `base_user_preferences`
+  ADD CONSTRAINT `base_user_preferences_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `base_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
 
 --
 -- Constraints for dumped tables
