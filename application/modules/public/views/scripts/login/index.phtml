@@ -141,7 +141,7 @@
                             // ...
                         },
                         success: function( response, textStatus, jqXHRresponse ) {
-                            if( response.status == 'LOGIN_OK' ) {
+                            if( response == 'LOGIN_OK' ) {
                                 window.location.reload();
                             } else {
                                 $('#frmErrors').html('<div class="alert alert-danger"><i class="fa fa-warning"></i> '+ translate('authentication_failure') +'</div>')
