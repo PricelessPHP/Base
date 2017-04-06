@@ -934,6 +934,7 @@ INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(812, 1, '
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(813, 1, 'prompt_follow_people', 'Follow friends and interesting people to see their photos here.');
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(814, 1, 'prompt_suggestions', 'Here are some suggestions.');
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(815, 1, 'following', 'Following');
+INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(816, '1', 'required_data', 'Required Data');
 
 -- --------------------------------------------------------
 
@@ -964,7 +965,7 @@ CREATE TABLE IF NOT EXISTS `base_site_config` (
 --
 
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(1, 'site_name', 'PricelessPHP Base Framework', NULL, 'global', 'text', '1', 'Site Name', NULL);
-INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(2, 'site_default_preloader_image_path', '__BASEURL__/images/preloader/486.gif', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(2, 'site_default_preloader_image_path', '<i class="fa fa-spinner fa-spin fa-fw"></i><span class="sr-only">Loading...</span>', NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(3, 'site_default_landing_page', '', NULL, 'global', 'text', '1', 'Local URL to redirect to after login, do not include the scheme, i.e. http://', NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(4, 'site_allow_template_change', '1', '0,1', 'global', 'radio', '1', 'Allow Template Change', NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(5, 'site_default_template', 'openface', NULL, 'global', 'text', '1', NULL, NULL);
@@ -1011,6 +1012,23 @@ INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `categ
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(94, 'site_default_time_zone', 'UTC', NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(95, 'site_cookie_domain', NULL, NULL , 'global', 'text', '1', NULL , NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(96, 'site_session_name', 'priceless', NULL , 'global', 'text', '1', NULL , NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(97, 'site_logo_html', '<img src="__BASEURL__/images/logo/small.png" style="width: 93px; height: 27px;" border="0">', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(98, 'site_default_layout_type', 'fluid', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(99, 'site_default_avatar_url_small', '__BASEURL__/images/profiles/default/male/nobody_m.32x32.jpg', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(100, 'site_login_type', 'email', 'email,username_password', 'global', 'radio', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(101, 'site_allowed_email_domains', 'pricelessphp.com', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(102, 'site_login_confirmation_timeout', '86400', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(109, 'site_hash_salt', 'jFb3P''pNH<UcLL4F)4ZXCYjW~z4^3v`z', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(110, 'site_default_usergroup_id', '2', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(111, 'site_required_user_data', 'first_name,last_name', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(112, 'site_email_pattern', '%first_name%.%last_name%@pricelessphp.(com),%last_name%@pricelessphp.(com)', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(113, 'site_email_regex', '/^[A-Za-z]+\\.[A-Za-z]+@(pricelessphp)\\.(com)$/', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(114, 'site_default_date_format', 'F d, Y', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(115, 'site_offline', '0', '0,1', 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(116, 'site_offline_notice', 'Due to session storage issues this site is temporarily offline. Please try again later.<br>Thank you.<hr>Aufgrund von Session-Speicherproblemen ist diese Seite derzeit offline. Bitte versuchen Sie es später erneut.<br><br>Vielen Dank.', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(117, 'site_session_timeout', '604800', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(118, 'site_idea_recently_active_threshold', '-14 day', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(119, 'site_idea_uncategorized_category_id', '5', NULL, 'global', 'text', '1', NULL, NULL);
 
 -- --------------------------------------------------------
 

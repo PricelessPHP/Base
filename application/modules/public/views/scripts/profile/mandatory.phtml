@@ -2,7 +2,7 @@
 <html>
 	<head>
         <meta charset="UTF-8" />
-	    <title><?php echo translate('login'); ?> &mdash; <?php echo SITE_NAME; ?></title>
+	    <title><?php echo SITE_NAME; ?> &mdash; <?php echo translate('login'); ?></title>
 	    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0">
 	    <meta name="apple-mobile-web-app-capable" content="yes" />
 
@@ -11,15 +11,11 @@
                 'partials/header/dependencies.phtml'
             );
         ?>
-
-		<script type="text/javascript">
-			var SOCIAL_LOGIN = null;
-		</script>     
-
+	    
 	    <?php echo SITE_GLOBAL_HTML_HEADER; ?>								     
 	</head>
 
-	<body style="padding-top: 0;">
+	<body>
 		<!-- START:		blockUI -->
 		<?php if( (int)SITE_USE_BLOCKUI == 1 ): ?>
 			<div style="display: block" class="blockUI"></div>
@@ -34,85 +30,73 @@
 		
         <?php echo $this->partial('partials/header/navbar.phtml'); ?>
 		
-	    <div class="container-fluid" style="margin-top: 50px;">
+	    <div class="container-fluid" style="margin-top: 10px;">
 	
 	        <!-- Headings -->
 	
 	        <div class="row">
 				<div class="col-lg-12">
-					<div class="page-header">
-						<h1>
-							<?php echo translate('login'); ?>
-						</h1>
-					</div>
-
-					<div id="frmErrors"></div>
-
-					<div class="tab-content">
-						<div class="tab-pane active" id="tabLocal">
-							<div style="margin-top: 20px;">
-								<form class="" action="" method="POST" name="frmUserLogin" id="frmUserLogin">
-									<div class="form-group">
-										<input autocomplete="off" type="text" class="form-control input-lg" placeholder="<?php echo translate('email'); ?>" id="frmEmail" name="email" data-required="1" data-type="email">
-									</div>
-
-									<div class="form-group">
-										<button id="btnUserLogin" class="btn btn-primary btn-lg btn-block"><?php echo translate('login'); ?></button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
+    	        	<div id="frmErrors"></div>
+    
+    				<div class="tab-content">
+    				  <div class="tab-pane active" id="tabLocal">
+    				  	<div style="margin-top: 10px;">
+							<h1 class="page-header">
+								<?php echo translate('required_data'); ?>
+							</h1>    	
+										  	
+            				<form class="" action="" method="POST" name="frmUserUpdate" id="frmUserUpdate">
+            					<?php foreach( $_SESSION['user']['required_data'] AS $key => $value ): ?>
+                				    <div class="form-group">
+                				        <input autocomplete="off" type="text" class="form-control input-lg" placeholder="<?php echo translate( $value ); ?>" id="frm<?php echo $value; ?>" name="<?php echo $value; ?>" data-required="1">
+                				    </div>
+            				    <?php endforeach; ?>
+            				    
+            				    <div class="form-group">
+            				        <button id="btnUserUpdate" class="btn btn-primary btn-lg btn-block"><?php echo translate('save'); ?></button>
+            				    </div>
+            				</form>
+    					</div>					        				  
+    				  </div>
+    
+    				</div>
 				</div>
-			</div>
-
-		</div>
+	        </div>
+		</div>		    
 		
 	    <script type="text/javascript" src="<?php echo PROTOCOL_RELATIVE_URL; ?>/js/bootstrap/bootstrap.min.js"></script>
 		<script type="text/javascript">
 		    $(document).ready(function() {
 
-				$('#btnUserLogin').click(function(event) {
+				$('#btnUserUpdate').click(function(event) {
 					event.preventDefault();
 
-					if( !formIsValid('frmUserLogin') ) {
-						$('#frmUserLogin').effect('shake');
+					if( !formIsValid('frmUserUpdate') ) {
+						$('#frmUserUpdate').effect('shake');
 						return false;
 					}					
 						
 					$.blockUI({
 						message: '<i class="fa fa-spinner fa-spin"></i>'
 					});
+
+					var formParams = $('#frmUserUpdate').formParams();
 					
 					$.ajax({
 						type: 'POST',
 						url: BASEURL + '/users/ajax',
 						data: { 
-							method: 'userLogin',
-							username: $('#frmEmail').val()
+							method: 'update',
+							data: formParams
 						},
 						complete: function( jqXHR, textStatus ) {
 							// ...
 						},
 						success: function( response, textStatus, jqXHRresponse ) {
 							if( response.status == 'OK' ) {
-								if( response.result == 'MUST_VERIFY' ) {
-									$('#frmErrors').html('');
-									$('#btnUserLogin').remove();
-
-									// success message
-									var message = '<i class="fa fa-check"></i> ' + str_replace( '%EMAIL%', $('#frmEmail').val(), translate('check_email_verify_login') );
-
-									// display the success message
-									$('#frmUserLogin').html('<div class="alert alert-success">'+ message +'</div>');
-
-									// unblock the interface
-									$.unblockUI();
-								} else {
-									// error
-								}											
+								window.location.reload();											
 							} else {
-								$('#frmErrors').html('<div class="alert alert-danger"><i class="fa fa-warning"></i> '+ translate('authentication_failure') +'</div>')
+								$('#frmErrors').html('<div class="alert alert-danger"><i class="fa fa-warning"></i> '+ response.error +'</div>')
 								$.unblockUI();
 							}
 						},
@@ -122,6 +106,21 @@
 						dataType: 'json'
 					});					
 				});
+							    			    		   			     			   
+				$.imgpreload([
+                        BASEURL + '/images/preloader/168.gif'
+					], {
+				    each: function() {
+				        // this = dom image object
+				        // check for success with: $(this).data('loaded')
+				        // callback executes on every image load
+				    },
+				    all: function() {
+				        // this = array of dom image objects
+				        // check for success with: $(this[i]).data('loaded')
+				        // callback executes when all images are loaded				    		    			    			        
+				    }
+				});							
 						    
 				$('body').imagesLoaded( function() {
 					$.unblockUI();
@@ -139,7 +138,10 @@
 		<script type="text/javascript" src="<?php echo PROTOCOL_RELATIVE_URL; ?>/js/bootstrap/extensions/bootbox/bootbox.js"></script>
 		<script type="text/javascript" src="<?php echo PROTOCOL_RELATIVE_URL; ?>/js/bootstrap/extensions/bootstrap-switch/bootstrap-switch.min.js"></script>
 
-        <!-- Form Validation -->
+        <!-- Form Params -->
+        <script type="text/javascript" src="<?php echo PROTOCOL_RELATIVE_URL; ?>/js/jquery.formparams.min.js"></script>
+
+        <!-- Custom Validation -->
         <script type="text/javascript" src="<?php echo PROTOCOL_RELATIVE_URL; ?>/js/custom.validation.js"></script>
 
         <?php echo SITE_GLOBAL_HTML_BODY_END; ?>

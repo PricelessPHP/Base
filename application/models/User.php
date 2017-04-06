@@ -837,7 +837,7 @@ class User extends Db
                 // a config variable in the DB
                 $existingRecord = $this->getByRegex(
                     array(
-                        'email' => '^'.$username.'+@(etrusted|trustedshops)\\.(com|de)$'
+                        'email' => '^'.$username.'+@(pricelessphp)\\.(com)$'
                     )
                 );
                 // END:     check for aliases
