@@ -833,11 +833,9 @@ class User extends Db
                 $username = getUsernameFromEmail( $email );
 
                 // START:   check for aliases
-                // @TODO    change this from hardcoded regex to
-                // a config variable in the DB
                 $existingRecord = $this->getByRegex(
                     array(
-                        'email' => '^'.$username.'+@(pricelessphp)\\.(com)$'
+                        'email' => '^'.$username.'+@'.SITE_LOGIN_DOMAIN_REGEX_SQL
                     )
                 );
                 // END:     check for aliases
