@@ -888,7 +888,8 @@ INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(764, 3, '
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(765, 3, 'site_recent_activity_threshold', 'Recent Activity Threshold');
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(766, 3, 'site_recent_post_limit', 'Recent Post Limit');
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(767, 3, 'site_require_email_confirm', 'Require e-mail Confirmation after User Registration?');
-INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(768, 3, 'site_rotate_user_comp_header', 'Rotate User Header Images');
+INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES
+(768, 3, 'site_rotate_user_comp_header', 'Rotate User Header Images');
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(769, 3, 'site_rotate_user_comp_header_interval', 'Header Rotation Interval (in seconds)');
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(770, 3, 'site_show_user_suggestions', 'Display User Suggestions');
 INSERT INTO `base_phrase` (`id`, `language_id`, `name`, `text`) VALUES(771, 3, 'site_status', 'Status');
@@ -1030,6 +1031,8 @@ INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `categ
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(118, 'site_idea_recently_active_threshold', '-14 day', NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(119, 'site_idea_uncategorized_category_id', '5', NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(120, 'site_default_time_zone', 'UTC', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(121, 'site_login_domain_regex_sql', '(pricelessphp)\\.(com)$', NULL, 'global', 'text', '1', NULL, NULL);
+
 
 -- --------------------------------------------------------
 
