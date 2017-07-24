@@ -3582,3 +3582,32 @@ function microtimeToHumanReadable( $microtime )
 {
     return number_format( $microtime, 4 ).' '.translate('seconds');
 }
+
+function mailjet_send_email( $params = array() )
+{
+    $Email  = new Email;
+    $params = array(
+        'email_system' => 'mailjet',
+        'server' => array(
+            'host' => SITE_MAILJET_SMTP_SERVER_HOST,
+            'port' => SITE_MAILJET_SMTP_SERVER_PORT,
+        ),
+        'smtp' => array(
+            'username' => SITE_MAILJET_SMTP_USERNAME,
+            'password' => SITE_MAILJET_SMTP_PASSWORD,
+        ),
+        'email' => array(
+            'to' => array(
+                'email' => $params['to']
+            ),
+            'from' => array(
+                'email' => $params['from']
+            ),
+            'body' => array(
+                'html' => $params['body']
+            )
+        )
+    );
+
+    return $Email->send( $params );
+}
