@@ -4,7 +4,7 @@
  * Various Functions
  *
  * @author      BizLogic <hire@bizlogicdev.com>
- * @copyright   2012 - 2015 BizLogic
+ * @copyright   2012 - 2017 BizLogic
  * @link        http://bizlogicdev.com
  * @link        http://pricelessphp.com
  *
@@ -3583,10 +3583,9 @@ function microtimeToHumanReadable( $microtime )
     return number_format( $microtime, 4 ).' '.translate('seconds');
 }
 
-function mailjet_send_email( $params = array() )
+function mailjet_send_email( $paramsCustom = array() )
 {
-    $Email  = new Email;
-    $params = array(
+    $paramsDefault = array(
         'email_system' => 'mailjet',
         'server' => array(
             'host' => SITE_MAILJET_SMTP_SERVER_HOST,
@@ -3598,16 +3597,19 @@ function mailjet_send_email( $params = array() )
         ),
         'email' => array(
             'to' => array(
-                'email' => $params['to']
+                'email' => null
             ),
             'from' => array(
-                'email' => $params['from']
+                'email' => SITE_EMAIL_ADDRESS
             ),
             'body' => array(
-                'html' => $params['body']
+                'html' => null
             )
         )
     );
+    
+    $params = array_merge_recursive( $paramsDefault, $paramsCustom ); 
+    $Email  = new Email;
 
     return $Email->send( $params );
 }
