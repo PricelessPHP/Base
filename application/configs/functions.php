@@ -3614,6 +3614,7 @@ function mailjet_send_email( $paramsCustom = array() )
     return $Email->send( $params );
 }
 
+// https://api.drupal.org/api/drupal/includes%21bootstrap.inc/function/drupal_array_merge_deep_array/7.x
 function array_merge_deep_array($arrays)
 {
     $result = array();
@@ -3640,6 +3641,7 @@ function array_merge_deep_array($arrays)
     return $result;
 }
 
+// https://api.drupal.org/api/drupal/includes!bootstrap.inc/function/drupal_array_merge_deep/7.x
 function array_merge_deep() 
 {
     $args = func_get_args();
