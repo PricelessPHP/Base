@@ -1030,8 +1030,7 @@ INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `categ
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(117, 'site_session_timeout', '604800', NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(118, 'site_idea_recently_active_threshold', '-14 day', NULL, 'global', 'text', '1', NULL, NULL);
 INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(119, 'site_idea_uncategorized_category_id', '5', NULL, 'global', 'text', '1', NULL, NULL);
-INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(120, 'site_default_time_zone', 'UTC', NULL, 'global', 'text', '1', NULL, NULL);
-INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(121, 'site_login_domain_regex_sql', '(pricelessphp).(com)$', NULL, 'global', 'text', '1', NULL, NULL);
+INSERT INTO `base_site_config` (`id`, `name`, `value`, `possible_values`, `category`, `ui_type`, `editable`, `hint`, `comment`) VALUES(120, 'site_login_domain_regex_sql', '(pricelessphp).(com)$', NULL, 'global', 'text', '1', NULL, NULL);
 
 
 -- --------------------------------------------------------
