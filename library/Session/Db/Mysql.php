@@ -163,7 +163,7 @@ class Session_Db_Mysql extends Db
     /**
      * Delete by Session ID
      *
-     * @param	stirng	$id
+     * @param	string	$id
      * @return	boolean
      */
     public function deleteBySessionId( $sessionId = '' )
